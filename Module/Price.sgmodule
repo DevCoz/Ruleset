@@ -1,0 +1,12 @@
+#!name=历史价格
+#!desc=该模块用于获取京东、淘宝商品历史价格 - by Licardo
+#!system=ios
+
+[Script]
+京东_历史价格 = type=http-response,requires-body=1,script-path=https://service.2ti.st/QuanX/Script/jd_tb_price/main.js,pattern=^https?://api\.m\.jd\.com/client\.action\?functionId=(wareBusiness|serverConfig|basicConfig)
+
+淘宝_历史价格 = type=http-request,requires-body=1,script-path=https://service.2ti.st/QuanX/Script/jd_tb_price/main.js,pattern=^http://.+/amdc/mobileDispatch
+淘宝_历史价格 = type=http-response,requires-body=1,script-path=https://service.2ti.st/QuanX/Script/jd_tb_price/main.js,pattern=^https?://trade-acs\.m\.taobao\.com/gw/mtop\.taobao\.detail\.getdetail
+
+[MITM]
+hostname = %APPEND% api.m.jd.com, trade-acs.m.taobao.com

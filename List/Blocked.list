@@ -1,0 +1,23 @@
+# All
+DOMAIN-SUFFIX,tw
+
+DOMAIN-KEYWORD,jav
+DOMAIN-KEYWORD,porn
+DOMAIN-KEYWORD,github
+DOMAIN-KEYWORD,Reddit
+DOMAIN-KEYWORD,twitter
+DOMAIN-KEYWORD,dropbox
+DOMAIN-KEYWORD,facebook
+DOMAIN-KEYWORD,instagram
+DOMAIN-SUFFIX,fb.me
+DOMAIN-SUFFIX,fbcdn.net
+DOMAIN-SUFFIX,twimg.com
+DOMAIN-SUFFIX,ampproject.org
+DOMAIN-SUFFIX,letsencrypt.org
+
+# Google
+DOMAIN-KEYWORD,google
+DOMAIN-KEYWORD,gmail
+DOMAIN-KEYWORD,youtube
+DOMAIN-SUFFIX,youtu.be
+DOMAIN-SUFFIX,gstatic.com

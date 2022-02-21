@@ -1,0 +1,103 @@
+# >Advertising Block
+# AD Block KEYWORD
+DOMAIN-KEYWORD,admarvel
+DOMAIN-KEYWORD,admaster
+DOMAIN-KEYWORD,adsage
+DOMAIN-KEYWORD,adsmogo
+DOMAIN-KEYWORD,adsrvmedia
+DOMAIN-KEYWORD,adwords
+DOMAIN-KEYWORD,adservice
+DOMAIN-KEYWORD,crashlytics
+DOMAIN-KEYWORD,domob
+DOMAIN-KEYWORD,duomeng
+DOMAIN-KEYWORD,dwtrack
+DOMAIN-KEYWORD,guanggao
+DOMAIN-KEYWORD,lianmeng
+DOMAIN-KEYWORD,dnserror
+DOMAIN-KEYWORD,omgmta
+DOMAIN-KEYWORD,openx
+DOMAIN-KEYWORD,partnerad
+DOMAIN-KEYWORD,pingfore
+DOMAIN-KEYWORD,supersonicads
+DOMAIN-KEYWORD,uedas
+DOMAIN-KEYWORD,umeng
+DOMAIN-KEYWORD,usage
+DOMAIN-KEYWORD,wlmonitor
+DOMAIN-KEYWORD,zjtoolbar
+
+# >> Alibaba
+DOMAIN,acs4baichuan.m.taobao.com
+DOMAIN,adash.m.taobao.com
+DOMAIN,adash.man.aliyuncs.com
+DOMAIN,adashbc.ut.taobao.com
+DOMAIN,adash-c.ut.taobao.com
+DOMAIN,adashxgc.ut.taobao.com
+DOMAIN,adashx4yt.m.taobao.com
+DOMAIN,amdc.m.taobao.com
+DOMAIN,apoll.m.taobao.com
+DOMAIN,nbsdk-baichuan.alicdn.com
+DOMAIN,tunion-api.m.taobao.com
+
+# > ByteDance (include China / Internation Version)
+DOMAIN,bds.snssdk.com
+DOMAIN,log.snssdk.com
+DOMAIN,snr.snssdk.com
+DOMAIN,smr.snssdk.com
+DOMAIN,extlog.snssdk.com
+DOMAIN,pangolin.snssdk.com
+DOMAIN-SUFFIX,pangolin-sdk-toutiao.com
+URL-REGEX,^https:\/\/[a-zA-Z]{2}\.snssdk\.com\/api\/ad\/
+
+# >> Netease hostname=m.ads.8le8le.com,iadmusicmat.music.com
+DOMAIN,nex.163.com
+DOMAIN,ad.yixin.im
+DOMAIN,n.3g.163.com
+DOMAIN,ad.bn.netease.com
+DOMAIN,log.yex.youdao.com
+DOMAIN,yt-adp.nosdn.127.net
+DOMAIN,iadmat.nosdn.127.net
+DOMAIN,impservice.youdao.com
+DOMAIN,iadmusicmat.music.126.net
+DOMAIN,iadmusicmatvideo.music.126.net
+DOMAIN,impservice.dictapp.youdao.com
+
+URL-REGEX,^http:\/\/p\d\.music\.126\.net\/\w+==\/\d+\.jpg$
+URL-REGEX,^http:\/\/iad.*mat\.[a-z]*\.12[67]\.net/\w+\.(jpg|mp4)$
+URL-REGEX,^https?://iadmusicmat.music.126.net/.+.jpg
+URL-REGEX,^http://interface.music.163.com/eapi/ad/config/get
+URL-REGEX,^https?://m.ads.8le8le.com/adShow
+
+# >> Tencent
+DOMAIN-SUFFIX,bugly.qq.com
+DOMAIN-SUFFIX,e.qq.com
+DOMAIN-SUFFIX,gdt.qq.com
+DOMAIN-SUFFIX,rqd.qq.com
+DOMAIN,mi.gdt.qq.com
+DOMAIN,btrace.qq.com
+DOMAIN,mtrace.qq.com
+DOMAIN,oth.eve.mdt.qq.com
+DOMAIN,oth.bls.mdt.qq.com
+DOMAIN,oth.str.mdt.qq.com
+DOMAIN,pgdt.gtimg.cn
+DOMAIN,pingma.qq.com
+DOMAIN,pingtcss.qq.com
+DOMAIN,splashqqlive.gtimg.com
+DOMAIN,tajs.qq.com
+DOMAIN,access-sngapm.qcloud.com
+DOMAIN,adstats.tencentmusic.com
+DOMAIN,ad.tencentmusic.comT
+DOMAIN,adcdn.tencentmusic.com
+DOMAIN,adexpo.tencentmusic.com
+DOMAIN,adclick.tencentmusic.com
+DOMAIN,p.l.qq.com
+DOMAIN-SUFFIX,beacon.qq.com
+DOMAIN-SUFFIX,sngdia.imtmp.net
+
+# URL-REGEX
+# Privacy
+URL-REGEX,^https?:\/\/(\w+\.)?(adclick|ads([0-9]+)?|adx|adserver|adformat|analysis|analytics|banners?|click|counter|delivery|log|log-?\w+?|pagead|stat|stats|statis|trace|track|tracking|uniad)\.\w+\.(com|cn|org|info|io|net|com.cn)
+
+# > 喜马拉雅
+URL-REGEX,"^http:\/\/[\s\S]*\/ting\/[a-z]*\/ts-\d+"
+URL-REGEX,"^http:\/\/.+\/(soundPatch|ting).*\/ts"
+AND,((USER-AGENT,ting*), (URL-REGEX,(^http:\/\/.+\/soundPatch|ad.*\.ximalaya\.com)))

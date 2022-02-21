@@ -1,0 +1,4 @@
+Ad-Pass = direct
+Ad-Block = reject
+Ad-GIF = reject-tinygif
+NO-DROP = REJECT-NO-DROP

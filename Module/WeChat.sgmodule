@@ -1,0 +1,14 @@
+#!name=WeChat Mock
+#!desc=WeChat Mock Module
+#!system=ios
+
+[Map Local]
+^https?:\/\/.+extshort\.weixin\.qq\.com\/cgi-bin\/mmoc-bin\/ad\/ data="https://github.com/DevCoz/Ruleset/raw/master/Mock/empty.json"
+^https?:\/\/.+\.weixin\.qq\.com\/.+report\? data="https://github.com/DevCoz/Ruleset/raw/master/Mock/empty.json"
+^https?:\/\/mp\.weixin\.qq\.com\/mp\/.+relatedarticle\? data="https://github.com/DevCoz/Ruleset/raw/master/Mock/empty.json"
+^https?:\/\/mp\.weixin\.qq\.com\/mp\/.+ad\? data="https://github.com/DevCoz/Ruleset/raw/master/Mock/empty.json"
+^https?:\/\/mp\.weixin\.qq\.com\/mp\/.+monitor\? data="https://github.com/DevCoz/Ruleset/raw/master/Mock/empty.json"
+^https?:\/\/mp\.weixin\.qq\.com\/bizmall\/reward\? data="https://github.com/DevCoz/Ruleset/raw/master/Mock/empty.json"
+
+[MITM]
+hostname = %APPEND% mp.weixin.qq.com
