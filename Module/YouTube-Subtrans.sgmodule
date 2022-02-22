@@ -1,8 +1,8 @@
 #!name=Youtube Subtrans
-#!desc=Youtube subtitles auto-translate
+#!desc=Youtube subtitles add-ons
 
 [Script]
-Youtube-Subtrans = type=http-request,pattern=https:\/\/www.youtube.com\/api\/timedtext.+,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/Neurogram-R/Surge/master/YouTube-Subtrans.js
-    
+YouTube-Subtrans = type=http-request,pattern=https:\/\/(setting|www).youtube.com\/(api\/timedtext.+|\?action=(g|s)et),requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/Neurogram-R/Surge/master/Dualsub.js
+
 [MITM]
-hostname = %APPEND% www.youtube.com
+hostname = %APPEND% *.youtube.com
