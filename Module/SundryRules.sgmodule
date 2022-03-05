@@ -3,7 +3,6 @@
 #!system=ios
 
 [General]
-skip-proxy = %APPEND% iosapps.itunes.apple.com
 force-http-engine-hosts = %APPEND% intl.iqiyi.com, maicai.api.ddxq.mobi, mobileapi-v6.elong.com, wmapi.meituan.com, weibointl.api.weibo.cn, *.ott.cibntv.net, 122.14.246.33, 175.102.178.52, 116.253.24.*, 175.6.26.*, 220.169.153.*, 222.218.85.*
 
 [Rule]
