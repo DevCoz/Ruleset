@@ -3,10 +3,8 @@
 #!system=ios
 
 [URL Rewrite]
+# Redirect Google Search Service
 ^https?:\/\/(www.)?(g|google)\.cn https://www.google.com 302
-(https:\/\/www\.google\.com([.a-z]+)?\/.+)(&safe=(active|strict)&)(.+) $1&safe=off 302
-https://www\.google\.com\.hk\/search\?q=([\w.]+)&(.+) https://www.google.com/search?q=$1&safe=off 302
-
 # AbeamTV Unlock
 ^https?:\/\/api\.abema\.io\/v\d\/ip\/check - reject
 
@@ -14,4 +12,4 @@ https://www\.google\.com\.hk\/search\?q=([\w.]+)&(.+) https://www.google.com/sea
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/WeChat.json"
 
 [MITM]
-hostname = %APPEND% www.google.cn, www.google.com, www.google.com.*, api.abema.io, mp.weixin.qq.com
+hostname = %APPEND% www.google.cn, api.abema.io, mp.weixin.qq.com
