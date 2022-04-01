@@ -12,4 +12,4 @@
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/WeChat.json"
 
 [MITM]
-hostname = %APPEND% www.google.cn, api.abema.io, mp.weixin.qq.com
+hostname = %APPEND% *.google.cn, api.abema.io, mp.weixin.qq.com
