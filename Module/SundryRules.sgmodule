@@ -2,6 +2,15 @@
 #!desc= Sundry Module.
 #!system=ios
 
+[Rule]
+# 屏蔽 YouTube 的 UDP
+AND,((PROTOCOL,UDP),(DOMAIN-SUFFIX,googlevideo.com)),REJECT-NO-DROP
+# Block P2P
+AND,((PROTOCOL,UDP),(OR,((DOMAIN-KEYWORD,bilibili),(DOMAIN-KEYWORD,biliapi),(DOMAIN-KEYWORD,mcdn),(DOMAIN-KEYWORD,douyu)))),REJECT-NO-DROP
+AND,((PROTOCOL,TCP),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,douyu)))),REJECT-NO-DROP
+# 屏蔽勾正数据
+DOMAIN-SUFFIX,gz-data.com,REJECT
+
 [URL Rewrite]
 # Redirect Google Search Service
 ^https?:\/\/(www.)?(g|google)\.cn https://www.google.com 302
