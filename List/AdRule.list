@@ -25,6 +25,7 @@ DOMAIN-KEYWORD,usage
 DOMAIN-KEYWORD,wlmonitor
 DOMAIN-KEYWORD,zjtoolbar
 
+# URL-REGEX
 # > ByteDance (include China / Internation Version)
 DOMAIN,bds.snssdk.com
 DOMAIN,log.snssdk.com
@@ -54,7 +55,26 @@ URL-REGEX,^https?://iadmusicmat.music.126.net/.+.jpg
 URL-REGEX,^http://interface.music.163.com/eapi/ad/config/get
 URL-REGEX,^https?://m.ads.8le8le.com/adShow
 
-# URL-REGEX
+# > 豆瓣
+URL-REGEX,^https://api.douban.com\b.*\/common_ads\?.*
+
+# > 美团
+URL-REGEX,^https?:\/\/img\.meituan\.net\/(adunion|display|midas)\/\w+\.(gif|jpg|jpg\.webp)$
+URL-REGEX,^https?:\/\/(s3plus|flowplus)\.meituan\.net\/v\d\/\w+\/linglong\/\w+\.(gif|jpg|mp4)
+URL-REGEX,^https?:\/\/p\d\.meituan\.net\/(bizad|wmbanner)\/\w+\.jpg
+URL-REGEX,^https?:\/\/p\d\.meituan\.net\/movie\/\w+\.jpg\?may_covertWebp
+
+# > 美团外卖开屏广告
+URL-REGEX,^https?:\/\/wmapi\.meituan\.com\/api\/v\d+\/loadInfo\?
+
+# > 虎牙直播
+URL-REGEX,^http?:\/\/business\.msstatic\.com\/advertiser\/material
+
+# > 京东开屏广告（此条规则会影响京东比价显示，使其失效）
+URL-REGEX,^https?:\/\/api\.m\.jd\.com\/client\.action\?functionId=start
+URL-REGEX,^https?:\/\/api\.m\.jd.com\/client\.action\?functionId=queryMaterialAdverts
+URL-REGEX,^https?:\/\/(bdsp-x|dsp-x)\.jd\.com\/adx\/
+
 # > 喜马拉雅
 URL-REGEX,"^http:\/\/[\s\S]*\/ting\/[a-z]*\/ts-\d+"
 URL-REGEX,"^http:\/\/.+\/(soundPatch|ting).*\/ts"
