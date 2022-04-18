@@ -55,6 +55,10 @@ URL-REGEX,^https?://iadmusicmat.music.126.net/.+.jpg
 URL-REGEX,^http://interface.music.163.com/eapi/ad/config/get
 URL-REGEX,^https?://m.ads.8le8le.com/adShow
 
+# > 腾讯
+DOMAIN-KEYWORD,adstats
+DOMAIN,adstats.tencentmusic.com
+
 # > 豆瓣
 URL-REGEX,^https://api.douban.com\b.*\/common_ads\?.*
 
