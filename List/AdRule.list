@@ -29,7 +29,6 @@ DOMAIN-KEYWORD,advertising.com
 DOMAIN-KEYWORD,wxsnsdy
 DOMAIN-KEYWORD,bahoom
 DOMAIN,daisydiskapp.com
-
 AND, ((DOMAIN-SUFFIX,msa.cdn.mediaset.net), (DOMAIN-KEYWORD,adv0))
 
 # >> Google
@@ -38,9 +37,6 @@ DOMAIN-KEYWORD,adwords
 AND, ((OR,((DOMAIN-SUFFIX,gvt0.com),(DOMAIN-SUFFIX,gvt2.com),(DOMAIN-SUFFIX,gvt3.com))),(DOMAIN-KEYWORD,beacon))
 
 # URL-REGEX
-
-# > douban
-URL-REGEX,^https://api.douban.com\b.*\/common_ads\?.*
 
 # >> Alibaba
 DOMAIN-KEYWORD,nbsdk-baichuan
@@ -69,6 +65,9 @@ URL-REGEX,^https?://asp.cntv.myalicdn.com/.+\?maxbr=850
 URL-REGEX,^https?://cntv.hls.cdn.myqcloud.com/.+\?maxbr=850
 URL-REGEX,^https?://v.cctv.com/.+850
 URL-REGEX,^https?://www.cntv.cn/nettv/adp/
+
+# > douban
+URL-REGEX,^https://api.douban.com\b.*\/common_ads\?.*
 
 # >> Didi
 URL-REGEX,^https://img-ys011.didistatic.com/static/ad_oss/
@@ -113,9 +112,6 @@ URL-REGEX,^https?://ms.jr.jd.com/gw/generic/base/na/m/adInfo
 # >> TikTok (include China / Internation Version)
 URL-REGEX,^https://[a-z]{2}.snssdk.com/api/ad/
 
-# > WeChat
-URL-REGEX,^https://mp.weixin.qq.com/mp/getappmsgad
-
 # >> XiGuaVideo
 DOMAIN-KEYWORD,ad.ixigua.com
 
@@ -154,14 +150,10 @@ URL-REGEX,^https?://m\d{1}.amap.com/ws/valueadded/alimama/splash_screen/
 
 # >> ChinaMobile
 URL-REGEX,^https?://app.10086.cn/biz-orange/DN/(findSale|homeSale)/getsaleAdver
+
 # >> ChinaUnicom
 URL-REGEX,^https?://m.client.10010.com/mobileService/customer/accountListData.htm
 URL-REGEX,^https?://m.client.10010.com/uniAdmsInterface/(getWelcomeAd|getHomePageAd)
-
-# >> Facebook
-URL-REGEX,^https?://www.facebook.com/.+video_click_to_advertiser_site
-# >> Fliggy
-URL-REGEX,^https?://acs.m.taobao.com/gw/mtop.trip.activity.querytmsresources/
 
 # >> Hupu
 URL-REGEX,^https?://games.mobileapi.hupu.com/.+/(interfaceAdMonitor|interfaceAd)/
@@ -172,9 +164,7 @@ URL-REGEX,^http?:\/\/business\.msstatic\.com\/advertiser\/material
 
 # >> IdleFish
 URL-REGEX,^https?://acs.m.taobao.com/gw/mtop\.taobao\.idle\.home\.welcome/
-# >> KouBei
-URL-REGEX,^https?://acs.m.taobao.com/gw/mtop\.o2o\.ad\.gateway\.get/
-URL-REGEX,^https?://render.alipay.com/p/s/h5data/prod/spring-festival-2019-h5data/popup-h5data.json
+
 # >> Kuaikan Comic
 URL-REGEX,^https?://api.kkmh.com/.+(ad|advertisement)/
 
@@ -265,7 +255,6 @@ URL-REGEX,^https?://.+/allOne.php\?ad_name
 # Privacy
 URL-REGEX,^https?:\/\/(\w+\.)?(adclick|ads([0-9]+)?|adx|adserver|adformat|analysis|analytics|banners?|click|counter|delivery|log|log-?\w+?|pagead|stat|stats|statis|trace|track|tracking|uniad)\.\w+\.(com|cn|org|info|io|net|com.cn)
 
-# > All
-AND,((DOMAIN-KEYWORD,f-log), (DOMAIN-SUFFIX,grammarly.io))
+# > Other
 DOMAIN,stun.smartgslb.com
 AND,((DOMAIN-SUFFIX,prod.hosts.ooklaserver.net), (DOMAIN-KEYWORD,.ad.))
