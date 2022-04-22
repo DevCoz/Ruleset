@@ -3,18 +3,33 @@ DOMAIN-SUFFIX,tw
 
 DOMAIN-KEYWORD,jav
 DOMAIN-KEYWORD,porn
-DOMAIN-KEYWORD,gmail
 DOMAIN-KEYWORD,Reddit
 DOMAIN-KEYWORD,github
-DOMAIN-KEYWORD,google
-DOMAIN-KEYWORD,youtube
 DOMAIN-KEYWORD,twitter
 DOMAIN-KEYWORD,dropbox
 DOMAIN-KEYWORD,facebook
 DOMAIN-KEYWORD,instagram
 
+# >> Google
+DOMAIN-SUFFIX,appspot.com
+DOMAIN-SUFFIX,blogger.com
+DOMAIN-SUFFIX,getoutline.org
+DOMAIN-SUFFIX,gvt0.com
+DOMAIN-SUFFIX,gvt1.com
+DOMAIN-SUFFIX,gvt2.com
+DOMAIN-SUFFIX,gvt3.com
+DOMAIN-SUFFIX,googleapis.cn
+DOMAIN-KEYWORD,google
+DOMAIN-SUFFIX,gmail.com
+DOMAIN-KEYWORD,blogspot
+
+# >> Other
 DOMAIN-SUFFIX,fb.me
 DOMAIN-SUFFIX,youtu.be
 DOMAIN-SUFFIX,fbcdn.net
 DOMAIN-SUFFIX,twimg.com
+DOMAIN-SUFFIX,pinimg.com
+DOMAIN-SUFFIX,pixiv.net
 DOMAIN-SUFFIX,gstatic.com
+DOMAIN-SUFFIX,reddit.com
+DOMAIN-SUFFIX,redditmedia.com
