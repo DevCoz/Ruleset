@@ -9,6 +9,10 @@ DOMAIN-KEYWORD,facebook
 DOMAIN-KEYWORD,instagram
 
 # >> Google
+DOMAIN-SUFFIX,g.co
+DOMAIN-SUFFIX,yt.be
+DOMAIN-SUFFIX,youtu.be
+DOMAIN-SUFFIX,ytimg.com
 DOMAIN-SUFFIX,appspot.com
 DOMAIN-SUFFIX,blogger.com
 DOMAIN-SUFFIX,getoutline.org
@@ -20,6 +24,7 @@ DOMAIN-SUFFIX,googleapis.cn
 DOMAIN-KEYWORD,google
 DOMAIN-SUFFIX,gmail.com
 DOMAIN-KEYWORD,blogspot
+DOMAIN-SUFFIX,xn--ngstr-lra8j.com
 
 # >> Other
 DOMAIN-SUFFIX,fb.me
