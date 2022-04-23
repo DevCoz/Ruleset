@@ -89,15 +89,13 @@ URL-REGEX,^https?://oimage([a-z])([0-9]).ydstatic.com/.+adpublish
 URL-REGEX,^https?://sp.kaola.com/api/openad
 URL-REGEX,^https?://support.you.163.com/xhr/boot/getBootMedia.json
 
-# >> Tencent
-URL-REGEX,^https?://edit.sinaapp.com/ua\?t=adv
-
 # >> Sina Weather
 URL-REGEX,^https?://tqt.weibo.cn/.+advert.index
 URL-REGEX,^https?://tqt.weibo.cn/api/advert/
 URL-REGEX,^https?://tqt.weibo.cn/overall/redirect.php\?r=(tqtad|tqt_sdkad)
 
 # >> Sina Weibo
+URL-REGEX,^https?://edit.sinaapp.com/ua\?t=adv
 URL-REGEX,^https?://sdkapp.uve.weibo.com/interface/sdk/sdkad.php
 URL-REGEX,^https?://wbapp.uve.weibo.com/wbapplua/wbpullad.lua
 URL-REGEX,^https?://sdkapp.uve.weibo.com/\interface/sdk/actionad.php
@@ -108,12 +106,6 @@ URL-REGEX,^https?://dsp-x.jd.com/adx/
 URL-REGEX,^https?://bdsp-x.jd.com/adx/
 URL-REGEX,^https?://api.m.jd.com/client.action\?functionId=start
 URL-REGEX,^https?://ms.jr.jd.com/gw/generic/base/na/m/adInfo
-
-# >> TikTok (include China / Internation Version)
-URL-REGEX,^https://[a-z]{2}.snssdk.com/api/ad/
-
-# >> XiGuaVideo
-DOMAIN-KEYWORD,ad.ixigua.com
 
 # >> XiMaLaYa
 URL-REGEX,^https?://adse.ximalaya.com/[a-z]{4}/loading\?appid=
@@ -144,6 +136,12 @@ URL-REGEX,^https?://.+.(musical|snssdk).(com|ly)/(api|motor)/ad/
 URL-REGEX,^https?://.+.pstatp.com/img/ad
 URL-REGEX,^https?://.+.snssdk.com/motor/operation/activity/display/config/v\d/
 URL-REGEX,^https?://dsp.toutiao.com/api/xunfei/ads/
+
+# >> TikTok (include China / Internation Version)
+URL-REGEX,^https://[a-z]{2}.snssdk.com/api/ad/
+
+# >> XiGuaVideo
+DOMAIN-KEYWORD,ad.ixigua.com
 
 # >> AMap
 URL-REGEX,^https?://m\d{1}.amap.com/ws/valueadded/alimama/splash_screen/
@@ -184,9 +182,7 @@ URL-REGEX,^https?://ssl.kohsocialapp.qq.com:10001/game/buttons
 URL-REGEX,^https?://3gimg.qq.com/tencentMapTouch/app/activity/
 URL-REGEX,^https?://newsso.map.qq.com/\?&attime=
 # >> Tencent News
-URL-REGEX,^https?://r.inews.qq.com/adsBlacklist
-URL-REGEX,^https?://r.inews.qq.com/getFullScreenPic
-URL-REGEX,^https?://r.inews.qq.com/getQQNewsRemoteConfig
+URL-REGEX,^https?://r.inews.qq.com/(adsBlacklist|getBannerAds|getFullScreenPic|getQQNewsRemoteConfig|getNewsRemoteConfig|searchHotCatList|getSplash|upLoadLoc)
 # >> Tencent QQLive
 URL-REGEX,^https?://.+\.mp4\?cdncode=.+&guid=
 URL-REGEX,^https?://.+\.mp4\?cdncode=.+&sdtfrom=v3004
@@ -196,6 +192,11 @@ URL-REGEX,^https?://vv.video.qq.com/getvmind\?
 URL-REGEX,^https?://mp.weixin.qq.com/mp/advertisement_report
 URL-REGEX,^https?://mp.weixin.qq.com/mp/ad_complaint
 URL-REGEX,^https?://mp.weixin.qq.com/mp/ad_video
+URL-REGEX,^https?://mp.weixin.qq.com/mp/getappmsgad
+URL-REGEX,^https?://mp.weixin.qq.com/mp/report
+URL-REGEX,^https?://szextshort.weixin.qq.com/cgi-bin/mmoc-bin/ad/
+# >> QQ Music
+URL-REGEX,^https?://y.gtimg.cn/music/common/upload/targeted_ads
 # >> The Paper
 URL-REGEX,^https?://adpai.thepaper.cn/.+&ad=
 # >> Thunder
@@ -210,11 +211,6 @@ URL-REGEX,^https?://img.meituan.net/midas/
 URL-REGEX,^https?://p\d.meituan.net/(mmc|wmbanner)/
 URL-REGEX,^https?://p\d.meituan.net/(adunion|display|linglong|mmc|wmbanner)/
 URL-REGEX,^https?://s3plus.meituan.net/.+/linglong/
-
-# >> MI
-URL-REGEX,^https?://api.m.mi.com/v\d/app/start
-URL-REGEX,^https?://api.jr.mi.com/v\d/adv/
-URL-REGEX,^https?://api.jr.mi.com/jr/api/playScreen
 
 # >> MI Fit
 URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/homepage_ad\?
@@ -232,9 +228,6 @@ URL-REGEX,^https?://ggic.cmvideo.cn/ad/
 URL-REGEX,^https?://ggic2.cmvideo.cn/ad/
 URL-REGEX,^https?://.+/img/ad.union.api/
 
-# >> Qdaily
-URL-REGEX,^https?://app3.qdaily.com/app3/boot_advertisements.json
-URL-REGEX,^https?://notch.qdaily.com/api/v\d/boot_ad
 # >> Renren Video
 URL-REGEX,^https?://api.rr.tv/ad/
 URL-REGEX,^https?://api.videozhishi.com/api/getAdvertising
