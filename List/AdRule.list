@@ -136,8 +136,6 @@ URL-REGEX,^https?://.+.(musical|snssdk).(com|ly)/(api|motor)/ad/
 URL-REGEX,^https?://.+.pstatp.com/img/ad
 URL-REGEX,^https?://.+.snssdk.com/motor/operation/activity/display/config/v\d/
 URL-REGEX,^https?://dsp.toutiao.com/api/xunfei/ads/
-
-# >> TikTok (include China / Internation Version)
 URL-REGEX,^https://[a-z]{2}.snssdk.com/api/ad/
 
 # >> XiGuaVideo
