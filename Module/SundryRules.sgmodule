@@ -7,13 +7,22 @@ AND,((PROTOCOL,UDP),(OR,((DOMAIN-KEYWORD,bilibili),(DOMAIN-KEYWORD,biliapi),(DOM
 AND,((PROTOCOL,TCP),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,douyu)))),REJECT
 
 [URL Rewrite]
-# Redirect Google Search Service
-^(http|https):\/\/(www.)?(g|google)\.cn https://www.google.com 307
 # AbeamTV Unlock
-^https?:\/\/api\.abema\.io\/v\d\/ip\/check - reject
+^https?://api\.abema\.io/v\d/ip/check - reject
+# Redirect Google Service
+^https?://(www.)?g\.cn https://www.google.com 302
+^https?://(www.)?google\.cn https://www.google.com 302
+# TikTok Internation
+(?<=(carrier|account|sys|sim)_region=)CN JP 307
+
+# Special AD Block Section
+
+# >> Xianyu
+^https?://gw\.alicdn\.com/tfs/.+\d{3,4}-\d{4} - reject
+^https?://gw\.alicdn\.com/tps/.+\d{3,4}-\d{4} - reject
+
+# >> NOMO
+^https?://nomo.dafork.com/api/v3/iap/ios_product_list https://ruleset.skk.moe/Assets/nomo.json 302
 
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/WeChat.json"
-
-[MITM]
-hostname = %APPEND% g.cn,www.g.cn,google.cn,www.google.cn, api.abema.io, mp.weixin.qq.com
