@@ -15,14 +15,8 @@ AND,((PROTOCOL,TCP),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,douyu)))),REJECT
 # TikTok Internation
 (?<=(carrier|account|sys|sim)_region=)CN JP 307
 
-# Special AD Block Section
-
-# >> Xianyu
-^https?://gw\.alicdn\.com/tfs/.+\d{3,4}-\d{4} - reject
-^https?://gw\.alicdn\.com/tps/.+\d{3,4}-\d{4} - reject
-
-# >> NOMO
-^https?://nomo.dafork.com/api/v3/iap/ios_product_list https://ruleset.skk.moe/Assets/nomo.json 302
-
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/WeChat.json"
+
+[Script]
+weixin = type=http-response,pattern=^https?://mp\.weixin\.qq\.com/s.+?,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/mieqq/mieqq/master/replace-body.js,script-update-interval=0,argument="</script>->setTimeout(()=>window.history.back(),8000); </script>"
