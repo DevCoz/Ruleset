@@ -168,16 +168,10 @@ URL-REGEX,^https?://api.kkmh.com/.+(ad|advertisement)/
 
 # >> SMZDM
 URL-REGEX,^https?://api.smzdm.com/v\d/util/loading
-# >> TaPiaoPiao
-URL-REGEX,^https?://acs.m.taobao.com/gw/mtop\.film\.mtopadvertiseapi.queryadvertise/
+
 # >> Tencent Futu Securities
 URL-REGEX,^https?://api5.futunn.com/ad/
-# >> Tencent Game
-URL-REGEX,^https?://qt.qq.com/lua/mengyou/get_splash_screen_info
-URL-REGEX,^https?://ssl.kohsocialapp.qq.com:10001/game/buttons
-# >> Tencent Maps
-URL-REGEX,^https?://3gimg.qq.com/tencentMapTouch/app/activity/
-URL-REGEX,^https?://newsso.map.qq.com/\?&attime=
+
 # >> Tencent News
 URL-REGEX,^https?://r.inews.qq.com/(adsBlacklist|getBannerAds|getFullScreenPic|getQQNewsRemoteConfig|getNewsRemoteConfig|searchHotCatList|getSplash|upLoadLoc)
 # >> Tencent QQLive
@@ -194,8 +188,7 @@ URL-REGEX,^https?://mp.weixin.qq.com/mp/report
 URL-REGEX,^https?://szextshort.weixin.qq.com/cgi-bin/mmoc-bin/ad/
 # >> QQ Music
 URL-REGEX,^https?://y.gtimg.cn/music/common/upload/targeted_ads
-# >> The Paper
-URL-REGEX,^https?://adpai.thepaper.cn/.+&ad=
+
 # >> Thunder
 URL-REGEX,^https?://images.client.vip.xunlei.com/.+/advert/
 
@@ -205,8 +198,7 @@ URL-REGEX,^https?://mob.mddcloud.com.cn/api/(ad|advert)/
 URL-REGEX,^https?://mangaapi.manhuaren.com/v\d/public/getStartPageAds
 # >> Meituan
 URL-REGEX,^https?://img.meituan.net/midas/
-URL-REGEX,^https?://p\d.meituan.net/(mmc|wmbanner)/
-URL-REGEX,^https?://p\d.meituan.net/(adunion|display|linglong|mmc|wmbanner)/
+URL-REGEX,^https?://p\d.meituan.net/(adunion|mmc|wmbanner)/
 URL-REGEX,^https?://s3plus.meituan.net/.+/linglong/
 
 # >> MI Fit
@@ -249,5 +241,3 @@ URL-REGEX,^https?://ctrl.(playcvn|zmzapi).(com|net)/app/(ads|init)
 URL-REGEX,^https?:\/\/(\w+\.)?(adclick|ads([0-9]+)?|adx|adserver|adformat|analysis|analytics|banners?|click|counter|delivery|log|log-?\w+?|pagead|stat|stats|statis|trace|track|tracking|uniad)\.\w+\.(com|cn|org|info|io|net|com.cn)
 
 # > Other
-DOMAIN,stun.smartgslb.com
-AND,((DOMAIN-SUFFIX,prod.hosts.ooklaserver.net), (DOMAIN-KEYWORD,.ad.))
