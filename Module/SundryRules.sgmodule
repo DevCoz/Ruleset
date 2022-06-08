@@ -17,3 +17,4 @@ AND,((PROTOCOL,TCP),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,douyu)))),REJECT
 
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/WeChat.json"
+^https?:\/\/.*\.ixigua\.com\/.+video_mp4.+ data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/empty.json"
