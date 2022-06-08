@@ -17,6 +17,3 @@ AND,((PROTOCOL,TCP),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,douyu)))),REJECT
 
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/WeChat.json"
-
-[Script]
-weixin = type=http-response,pattern=^https?://mp\.weixin\.qq\.com/s.+?,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/mieqq/mieqq/master/replace-body.js,script-update-interval=0,argument="</script>->setTimeout(()=>window.history.back(),8000); </script>"
