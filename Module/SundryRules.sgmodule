@@ -12,8 +12,6 @@ AND,((PROTOCOL,TCP),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,douyu)))),REJECT
 # Redirect Google Service
 ^https?://(www.)?g\.cn https://www.google.com 302
 ^https?://(www.)?google\.cn https://www.google.com 302
-# TikTok Internation
-(?<=(carrier|account|sys|sim)_region=)CN JP 307
 
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://github.com/DevCoz/Ruleset/raw/Pv/Mock/WeChat.json"
