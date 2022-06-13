@@ -8,6 +8,8 @@ DOMAIN-KEYWORD,dropbox
 DOMAIN-KEYWORD,facebook
 DOMAIN-KEYWORD,instagram
 
+DOMAIN-KEYWORD,testflight
+
 # >> Google
 DOMAIN-SUFFIX,g.co
 DOMAIN-SUFFIX,yt.be
