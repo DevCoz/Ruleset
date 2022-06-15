@@ -41,15 +41,6 @@ AND, ((OR,((DOMAIN-SUFFIX,gvt0.com),(DOMAIN-SUFFIX,gvt2.com),(DOMAIN-SUFFIX,gvt3
 # >> Alibaba
 DOMAIN-KEYWORD,nbsdk-baichuan
 
-# >> Baidu
-URL-REGEX,^https?://.+/client/phpui2/
-URL-REGEX,^https?://cover.baidu.com/cover/page/dspSwitchAds/
-URL-REGEX,^https?://c.tieba.baidu.com/c/s/splashSchedule
-URL-REGEX,^https?://issuecdn.baidupcs.com/issue/netdisk/guanggao/
-URL-REGEX,^https?://update.pan.baidu.com/statistics
-URL-REGEX,^http://.*baidu.com/.*ad[xs].php
-URL-REGEX,^http://c.tieba.baidu.com/c/s/splashSchedule$
-
 # >> Bilibili
 AND,((USER-AGENT,bili*), (NOT,((DOMAIN-SUFFIX,bilibili.com))), (NOT,((DOMAIN-SUFFIX,hdslb.com))), (NOT,((DOMAIN-SUFFIX,wo.cn))), (NOT,((DOMAIN-SUFFIX,biligame.com))),(NOT,((DOMAIN-SUFFIX,bilivideo.com))), (NOT,((DOMAIN-SUFFIX,biliapi.com))))
 
@@ -82,17 +73,6 @@ URL-REGEX,^https?://oimage([a-z])([0-9]).ydstatic.com/.+adpublish
 URL-REGEX,^https?://sp.kaola.com/api/openad
 URL-REGEX,^https?://support.you.163.com/xhr/boot/getBootMedia.json
 
-# >> Sina Weather
-URL-REGEX,^https?://tqt.weibo.cn/.+advert.index
-URL-REGEX,^https?://tqt.weibo.cn/api/advert/
-URL-REGEX,^https?://tqt.weibo.cn/overall/redirect.php\?r=(tqtad|tqt_sdkad)
-
-# >> Sina Weibo
-URL-REGEX,^https?://edit.sinaapp.com/ua\?t=adv
-URL-REGEX,^https?://sdkapp.uve.weibo.com/interface/sdk/sdkad.php
-URL-REGEX,^https?://wbapp.uve.weibo.com/wbapplua/wbpullad.lua
-URL-REGEX,^https?://sdkapp.uve.weibo.com/\interface/sdk/actionad.php
-
 # >> JD
 URL-REGEX,^http://api.m.jd.com/client.action\?functionId=start$
 URL-REGEX,^https?://dsp-x.jd.com/adx/
@@ -120,9 +100,6 @@ URL-REGEX,^https?://fdfs.xmcdn.com/group25/M05/92/D1/
 URL-REGEX,"^http:\/\/[\s\S]*\/ting\/[a-z]*\/ts-\d+"
 URL-REGEX,"^http:\/\/.+\/(soundPatch|ting).*\/ts"
 AND,((USER-AGENT,ting*), (URL-REGEX,(^http:\/\/.+\/soundPatch|ad.*\.ximalaya\.com)))
-
-# >> Acfun
-URL-REGEX,^https?://aes.acfun.cn/s\?adzones
 
 # >> ByteDance
 URL-REGEX,^https?://.+.(musical|snssdk).(com|ly)/(api|motor)/ad/
@@ -177,8 +154,6 @@ URL-REGEX,^https?://mp.weixin.qq.com/mp/ad_video
 URL-REGEX,^https?://mp.weixin.qq.com/mp/getappmsgad
 URL-REGEX,^https?://mp.weixin.qq.com/mp/report
 URL-REGEX,^https?://szextshort.weixin.qq.com/cgi-bin/mmoc-bin/ad/
-# >> QQ Music
-URL-REGEX,^https?://y.gtimg.cn/music/common/upload/targeted_ads
 
 # >> Thunder
 URL-REGEX,^https?://images.client.vip.xunlei.com/.+/advert/
@@ -224,9 +199,6 @@ URL-REGEX,^https?://m.yap.yahoo.com/v18/getAds.do
 # >> YOUKU
 URL-REGEX,^https?://.+\.mp4\?ccode=0902
 URL-REGEX,^https?://.+\.mp4\?sid=
-
-# >> YYeTs
-URL-REGEX,^https?://ctrl.(playcvn|zmzapi).(com|net)/app/(ads|init)
 
 # Privacy
 URL-REGEX,^https?:\/\/(\w+\.)?(adclick|ads([0-9]+)?|adx|adserver|adformat|analysis|analytics|banners?|click|counter|delivery|log|log-?\w+?|pagead|stat|stats|statis|trace|track|tracking|uniad)\.\w+\.(com|cn|org|info|io|net|com.cn)
