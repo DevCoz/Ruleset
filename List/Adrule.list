@@ -26,10 +26,12 @@ DOMAIN-KEYWORD,advertising.com
 
 # Tencent AD KEYWORD
 DOMAIN-KEYWORD,wxsnsdy
-
 DOMAIN-KEYWORD,bahoom
 DOMAIN,daisydiskapp.com
 AND, ((DOMAIN-SUFFIX,msa.cdn.mediaset.net), (DOMAIN-KEYWORD,adv0))
+IP-CIDR,140.249.94.150/32,REJECT,no-resolve
+IP-CIDR,150.138.229.18/32,REJECT,no-resolve
+IP-CIDR,116.207.148.20/32,REJECT,no-resolve
 
 # >> Google
 DOMAIN-KEYWORD,adsense
@@ -41,9 +43,6 @@ AND, ((OR,((DOMAIN-SUFFIX,gvt0.com),(DOMAIN-SUFFIX,gvt2.com),(DOMAIN-SUFFIX,gvt3
 # >> Alibaba
 DOMAIN-KEYWORD,nbsdk-baichuan
 
-# >> Bilibili
-AND,((USER-AGENT,bili*), (NOT,((DOMAIN-SUFFIX,bilibili.com))), (NOT,((DOMAIN-SUFFIX,hdslb.com))), (NOT,((DOMAIN-SUFFIX,wo.cn))), (NOT,((DOMAIN-SUFFIX,biligame.com))),(NOT,((DOMAIN-SUFFIX,bilivideo.com))), (NOT,((DOMAIN-SUFFIX,biliapi.com))))
-
 # >> CNTV
 URL-REGEX,^https?://asp.cntv.myalicdn.com/.+\?maxbr=850
 URL-REGEX,^https?://cntv.hls.cdn.myqcloud.com/.+\?maxbr=850
@@ -52,6 +51,8 @@ URL-REGEX,^https?://www.cntv.cn/nettv/adp/
 
 # > douban
 URL-REGEX,^https://api.douban.com\b.*\/common_ads\?.*
+URL-REGEX,^https?:\/\/img(.*)\.doubanio\.com\/f\/talion\/.+\/js\/lib\/douban-ad-helper\.js$
+URL-REGEX,^https?:\/\/img(.*)\.doubanio\.com\/f\/talion\/.+\/js\/card\/zepto\.min\.js$
 
 # >> Didi
 URL-REGEX,^https://img-ys011.didistatic.com/static/ad_oss/
@@ -74,11 +75,7 @@ URL-REGEX,^https?://sp.kaola.com/api/openad
 URL-REGEX,^https?://support.you.163.com/xhr/boot/getBootMedia.json
 
 # >> JD
-URL-REGEX,^http://api.m.jd.com/client.action\?functionId=start$
-URL-REGEX,^https?://dsp-x.jd.com/adx/
-URL-REGEX,^https?://bdsp-x.jd.com/adx/
-URL-REGEX,^https?://api.m.jd.com/client.action\?functionId=start
-URL-REGEX,^https?://ms.jr.jd.com/gw/generic/base/na/m/adInfo
+
 
 # >> XiMaLaYa
 URL-REGEX,^https?://adse.ximalaya.com/[a-z]{4}/loading\?appid=
@@ -102,11 +99,11 @@ URL-REGEX,"^http:\/\/.+\/(soundPatch|ting).*\/ts"
 AND,((USER-AGENT,ting*), (URL-REGEX,(^http:\/\/.+\/soundPatch|ad.*\.ximalaya\.com)))
 
 # >> ByteDance
-URL-REGEX,^https?://.+.(musical|snssdk).(com|ly)/(api|motor)/ad/
-URL-REGEX,^https?://.+.pstatp.com/img/ad
-URL-REGEX,^https?://.+.snssdk.com/motor/operation/activity/display/config/v\d/
-URL-REGEX,^https?://dsp.toutiao.com/api/xunfei/ads/
-URL-REGEX,^https://[a-z]{2}.snssdk.com/api/ad/
+URL-REGEX,^https?+:\/\/.+?\.pstatp\.com\/img\/ad
+URL-REGEX,^https?+:\/\/.+?\/img\/ad\.union\.api\/
+URL-REGEX,^https?+:\/\/dsp\.toutiao\.com\/api\/xunfei\/ads\/
+URL-REGEX,^https?+:\/\/.+?\.snssdk\.com\/motor\/operation\/activity\/display\/config\/V2\/
+URL-REGEX,^https?+:\/\/.+?\.(?>amemv|musical|snssdk|tiktokv)\.(?>com|ly)\/(?>api|motor)\/ad\/
 
 # >> XiGuaVideo
 DOMAIN-KEYWORD,ad.ixigua.com
