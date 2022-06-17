@@ -24,15 +24,6 @@ DOMAIN-SUFFIX,mmstat.com
 DOMAIN-SUFFIX,amplitude.com
 DOMAIN-KEYWORD,advertising.com
 
-# Tencent AD KEYWORD
-DOMAIN-KEYWORD,wxsnsdy
-DOMAIN-KEYWORD,bahoom
-DOMAIN,daisydiskapp.com
-AND, ((DOMAIN-SUFFIX,msa.cdn.mediaset.net), (DOMAIN-KEYWORD,adv0))
-IP-CIDR,140.249.94.150/32,REJECT,no-resolve
-IP-CIDR,150.138.229.18/32,REJECT,no-resolve
-IP-CIDR,116.207.148.20/32,REJECT,no-resolve
-
 # >> Google
 DOMAIN-KEYWORD,adsense
 DOMAIN-KEYWORD,adwords
@@ -134,23 +125,20 @@ URL-REGEX,^https?://api.kkmh.com/.+(ad|advertisement)/
 # >> SMZDM
 URL-REGEX,^https?://api.smzdm.com/v\d/util/loading
 
-# >> Tencent Futu Securities
-URL-REGEX,^https?://api5.futunn.com/ad/
+# Tencent AD KEYWORD
+DOMAIN-KEYWORD,wxsnsdy
+DOMAIN-KEYWORD,bahoom
+DOMAIN,daisydiskapp.com
+AND, ((DOMAIN-SUFFIX,msa.cdn.mediaset.net), (DOMAIN-KEYWORD,adv0))
+IP-CIDR,140.249.94.150/32,REJECT,no-resolve
+IP-CIDR,150.138.229.18/32,REJECT,no-resolve
+IP-CIDR,116.207.148.20/32,REJECT,no-resolve
 
-# >> Tencent News
-URL-REGEX,^https?://r.inews.qq.com/(adsBlacklist|getBannerAds|getFullScreenPic|getQQNewsRemoteConfig|getNewsRemoteConfig|searchHotCatList|getSplash|upLoadLoc)
 # >> Tencent QQLive
 URL-REGEX,^https?://.+\.mp4\?cdncode=.+&guid=
 URL-REGEX,^https?://.+\.mp4\?cdncode=.+&sdtfrom=v3004
 URL-REGEX,^https?://btrace.qq.com
 URL-REGEX,^https?://vv.video.qq.com/getvmind\?
-# >> Tencent WeChat
-URL-REGEX,^https?://mp.weixin.qq.com/mp/advertisement_report
-URL-REGEX,^https?://mp.weixin.qq.com/mp/ad_complaint
-URL-REGEX,^https?://mp.weixin.qq.com/mp/ad_video
-URL-REGEX,^https?://mp.weixin.qq.com/mp/getappmsgad
-URL-REGEX,^https?://mp.weixin.qq.com/mp/report
-URL-REGEX,^https?://szextshort.weixin.qq.com/cgi-bin/mmoc-bin/ad/
 
 # >> Thunder
 URL-REGEX,^https?://images.client.vip.xunlei.com/.+/advert/
@@ -159,10 +147,6 @@ URL-REGEX,^https?://images.client.vip.xunlei.com/.+/advert/
 URL-REGEX,^https?://mob.mddcloud.com.cn/api/(ad|advert)/
 # >> Manhuaren
 URL-REGEX,^https?://mangaapi.manhuaren.com/v\d/public/getStartPageAds
-# >> Meituan
-URL-REGEX,^https?://img.meituan.net/midas/
-URL-REGEX,^https?://p\d.meituan.net/(adunion|mmc|wmbanner)/
-URL-REGEX,^https?://s3plus.meituan.net/.+/linglong/
 
 # >> MI Fit
 URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/homepage_ad\?
@@ -192,10 +176,6 @@ URL-REGEX,^https?://gw.alicdn.com/mt/
 
 # >> Yahoo!
 URL-REGEX,^https?://m.yap.yahoo.com/v18/getAds.do
-
-# >> YOUKU
-URL-REGEX,^https?://.+\.mp4\?ccode=0902
-URL-REGEX,^https?://.+\.mp4\?sid=
 
 # Privacy
 URL-REGEX,^https?:\/\/(\w+\.)?(adclick|ads([0-9]+)?|adx|adserver|adformat|analysis|analytics|banners?|click|counter|delivery|log|log-?\w+?|pagead|stat|stats|statis|trace|track|tracking|uniad)\.\w+\.(com|cn|org|info|io|net|com.cn)
