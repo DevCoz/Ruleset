@@ -41,6 +41,7 @@ URL-REGEX,^https?://v.cctv.com/.+850
 URL-REGEX,^https?://www.cntv.cn/nettv/adp/
 
 # > douban
+URL-REGEX,^https?:\/\/api\.douban\.com\/v\d\/app_ads\/
 URL-REGEX,^https://api.douban.com\b.*\/common_ads\?.*
 URL-REGEX,^https?:\/\/img(.*)\.doubanio\.com\/f\/talion\/.+\/js\/lib\/douban-ad-helper\.js$
 URL-REGEX,^https?:\/\/img(.*)\.doubanio\.com\/f\/talion\/.+\/js\/card\/zepto\.min\.js$
@@ -64,9 +65,6 @@ URL-REGEX,^https?://dsp-impr2.youdao.com/adload.s\?
 URL-REGEX,^https?://oimage([a-z])([0-9]).ydstatic.com/.+adpublish
 URL-REGEX,^https?://sp.kaola.com/api/openad
 URL-REGEX,^https?://support.you.163.com/xhr/boot/getBootMedia.json
-
-# >> JD
-
 
 # >> XiMaLaYa
 URL-REGEX,^https?://adse.ximalaya.com/[a-z]{4}/loading\?appid=
@@ -147,15 +145,6 @@ URL-REGEX,^https?://images.client.vip.xunlei.com/.+/advert/
 URL-REGEX,^https?://mob.mddcloud.com.cn/api/(ad|advert)/
 # >> Manhuaren
 URL-REGEX,^https?://mangaapi.manhuaren.com/v\d/public/getStartPageAds
-
-# >> MI Fit
-URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/homepage_ad\?
-URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/sleep_ad\?
-URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/sport_ad\?
-URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/sport_summary_ad\?
-URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/sport_training_ad\?
-URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/step_detail_ad\?
-URL-REGEX,^https?://api-mifit.huami.com/discovery/mi/discovery/training_video_ad\?
 
 # >> MIgu
 URL-REGEX,^https?://.+/v\d/iflyad/
