@@ -1,5 +1,4 @@
 # >> Disney+
-USER-AGENT,Disney+*
 DOMAIN,cdn.registerdisney.go.com
 DOMAIN-SUFFIX,bamgrid.com
 DOMAIN-SUFFIX,disney-plus.net
@@ -7,8 +6,9 @@ DOMAIN-SUFFIX,disneyplus.com
 DOMAIN-SUFFIX,dssott.com
 DOMAIN-SUFFIX,disneystreaming.com
 
+USER-AGENT,Disney+*
+
 # > Netflix
-USER-AGENT,Argo*
 DOMAIN-SUFFIX,netflix.ca
 DOMAIN-SUFFIX,netflix.com
 DOMAIN-SUFFIX,netflix.net
@@ -22,6 +22,8 @@ DOMAIN-KEYWORD,netflixdnstest
 DOMAIN-KEYWORD,dualstack.apiproxy-
 DOMAIN-KEYWORD,dualstack.ichnaea-web-
 DOMAIN-KEYWORD,apiproxy-device-prod-nlb-
+
+USER-AGENT,Argo*
 
 # >> Netflix ip
 IP-CIDR,23.246.0.0/18,no-resolve
@@ -42,3 +44,17 @@ IP-CIDR,208.75.76.0/22,no-resolve
 IP-CIDR,34.210.42.111/32,no-resolve
 IP-CIDR,52.89.124.203/32,no-resolve
 IP-CIDR,54.148.37.5/32,no-resolve
+
+# >> TikTok
+
+DOMAIN-SUFFIX,byteoversea.com
+DOMAIN-SUFFIX,ibytedtos.com
+DOMAIN-SUFFIX,muscdn.com
+DOMAIN-SUFFIX,musical.ly
+DOMAIN-SUFFIX,tiktok.com
+DOMAIN-SUFFIX,tik-tokapi.com
+DOMAIN-SUFFIX,tiktokcdn.com
+DOMAIN-SUFFIX,tiktokv.com
+DOMAIN-KEYWORD,-tiktokcdn-com
+
+USER-AGENT,TikTok*
