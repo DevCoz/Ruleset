@@ -1,15 +1,12 @@
 #!name= SundryRules
 #!desc= Sundry Module.
 
-[Rule]
-# Block P2P
-AND,((PROTOCOL,UDP),(OR,((DOMAIN-KEYWORD,bilibili),(DOMAIN-KEYWORD,biliapi),(DOMAIN-KEYWORD,mcdn),(DOMAIN-KEYWORD,douyu)))),REJECT
-AND,((PROTOCOL,TCP),(OR,((DOMAIN-KEYWORD,stun),(DOMAIN-KEYWORD,douyu)))),REJECT
-
 [URL Rewrite]
 # AbeamTV Unlock
 ^https?://api\.abema\.io/v\d/ip/check - reject
 # Redirect Google Service
+^https?:\/\/(www\.)?g\.cn https://www.google.com/ncr 302
+^https?:\/\/(www\.)?google\.cn https://www.google.com/ncr 302
 (?<=google.)cn com.hk header
 (?<=client=)safari safari&hl=zh-CN&sourceid=cndr header
 
