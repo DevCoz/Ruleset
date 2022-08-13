@@ -150,5 +150,3 @@ URL-REGEX,^https?://gw.alicdn.com/mt/
 
 # Privacy
 URL-REGEX,^https?:\/\/(\w+\.)?(adclick|ads([0-9]+)?|adx|adserver|adformat|analysis|analytics|banners?|click|counter|delivery|log|log-?\w+?|pagead|stat|stats|statis|trace|track|tracking|uniad)\.\w+\.(com|cn|org|info|io|net|com.cn)
-
-# > Other
