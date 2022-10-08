@@ -95,8 +95,10 @@ URL-REGEX,^https?://m.client.10010.com/mobileService/customer/accountListData.ht
 URL-REGEX,^https?://m.client.10010.com/uniAdmsInterface/(getWelcomeAd|getHomePageAd)
 
 # >> Hupu
-URL-REGEX,^https?://games.mobileapi.hupu.com/.+/(interfaceAdMonitor|interfaceAd)/
-URL-REGEX,^https?://games.mobileapi.hupu.com/.+/status/init
+URL-REGEX,^https?:\/\/i\d\.hoopchina\.com\.cn/blogfile\//d+\//d+\/BbsImg\.(?<=(big.(png|jpg)))$
+URL-REGEX,^https?:\/\/games\.mobileapi\.hupu\.com\/.+\/(search|interfaceAdMonitor|status|hupuBbsPm)/(hotkey|init|hupuBbsPm)\.
+URL-REGEX,^https?:\/\/goblin\.hupu\.com\/.+\/interfaceAd\/getOther
+URL-REGEX,^https?:\/\/i1\.hoopchina\.com\.cn\/blogfile\/.+_\d{3}x\d{4}
 
 # > huya
 URL-REGEX,^http?:\/\/business\.msstatic\.com\/advertiser\/material
