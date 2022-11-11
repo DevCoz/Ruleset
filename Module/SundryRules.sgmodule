@@ -10,7 +10,7 @@
 (?<=client=)safari safari&hl=zh-CN&sourceid=cndr header
 
 [Map Local]
-^http:\/\/pgdt\.gtimg\.cn data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-img.gif"
-^http:\/\/.+\.tc\.qq\.com\/.+mp4 data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/blank.mp4"
+^https?:\/\/pgdt\.gtimg\.cn data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-img.gif"
+^https?:\/\/.+\.tc\.qq\.com\/.+mp4 data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/blank.mp4"
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 ^https?:\/\/.*\.ixigua\.com\/.+video_mp4.+ data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/empty.json"
