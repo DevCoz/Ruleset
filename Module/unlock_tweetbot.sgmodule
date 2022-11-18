@@ -1,1 +1,8 @@
+#!name=unlock tweetbot
+#!desc=tweetbot
 
+[MITM]
+hostname = %APPEND% *.tapbots.com
+
+[Script]
+tweetbot = type=http-response,pattern=https://push.tapbots.com/tweetbot/5/verify_subscription,requires-body=1,max-size=0,script-path=tweetbot.js
