@@ -9,4 +9,6 @@
 ^https?:\/\/pgdt\.gtimg\.cn data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-img.gif"
 ^https?:\/\/.+\.tc\.qq\.com\/.+mp4 data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/blank.mp4"
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
-^https?:\/\/.*\.ixigua\.com\/.+video_mp4.+ data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/empty.json"
+
+[MITM]
+hostname = %APPEND% api.douban.com, *doubanio.com, 
