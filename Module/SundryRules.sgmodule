@@ -11,4 +11,4 @@
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, *doubanio.com, *.pstatp.com
+hostname = %APPEND% api.douban.com, *doubanio.com, *.pglstatp-toutiao.com
