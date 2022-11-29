@@ -1,11 +1,11 @@
-#!name=unlock revenuecat
-#!desc=unlock Subscription
+#!name=Unlock Revenuecat
+#!desc=Revenuecat
 
-[Url Rewrite]
+[Header Rewrite]
 https:\/\/api\.revenuecat\.com header-del x-revenuecat-etag
 
 [MITM]
 hostname = %APPEND% api.revenuecat.com
 
 [Script]
-Revenuecat = type=http-response,pattern=https:\/\/api\.revenuecat\.com,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Js/revenuecat.js,script-update-interval=-1
+Revenuecat = type=http-response,pattern=https:\/\/api\.revenuecat\.com,requires-body=1,max-size=0,script-path=revenuecat.js,script-update-interval=-1
