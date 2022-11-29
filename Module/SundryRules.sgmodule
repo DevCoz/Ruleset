@@ -15,4 +15,4 @@
 ^https:\/\/firebaseremoteconfig\.googleapis\.com\/v1\/projects data="5044D94D.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, *doubanio.com, *.pglstatp-toutiao.com
+hostname = %APPEND% api.douban.com, *doubanio.com, *.pglstatp-toutiao.com, firebaseremoteconfig.googleapis.com
