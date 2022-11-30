@@ -8,7 +8,7 @@ REJECT-ARRAY
 返回HTTP状态码200，内容为空的JSON数组。
 
 REJECT-200
-返回HTTP状态码200,没有内容。
+返回HTTP状态码200, 没有内容。
 
 REJECT-IMG
 返回HTTP状态码200，内容为1像素GIF。
