@@ -1,12 +1,17 @@
 REJECT
 返回HTTP状态码404，没有内容。
+
 REJECT-DICT
 返回HTTP状态码200，内容为空的JSON对象。
+
 REJECT-ARRAY
 返回HTTP状态码200，内容为空的JSON数组。
+
 REJECT-200
 返回HTTP状态码200,没有内容。
+
 REJECT-IMG
 返回HTTP状态码200，内容为1像素GIF。
+
 REJECT-TINYGIF
 返回HTTP状态码200，内容为1像素GIF。
