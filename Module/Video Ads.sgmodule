@@ -1,4 +1,4 @@
-#!name=视频广告
+#!name=Video Ads
 #!desc=Tencent Video, Youku, iqiyi
 #!system=ios
 
@@ -9,7 +9,15 @@ force-http-engine-hosts = %APPEND% *.cp31.ott.cibntv.net,220.112*,211.162*,124.1
 DOMAIN,video-ad.sm.cn,REJECT-DROP
 DOMAIN,api.cupid.dns.iqiyi.com,REJECT
 DOMAIN-SUFFIX,cupid.iqiyi.com,REJECT
+AND,((PROTOCOL,HTTPS), (DOMAIN,iacc.qq.com)),REJECT-NO-DROP
 
 [URL Rewrite]
 http://.+\.cp31\.ott\.cibntv\.net - reject
 http://(\d{1,3}\.){3}\d{1,3}/(variety|vlive\.qqvideo)\.tc\.qq\.com/ - reject
+
+[Map Local]
+^https?:\/\/pgdt\.gtimg\.cn data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-img.gif"
+^https?:\/\/.+\.tc\.qq\.com\/.+mp4 data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/blank.mp4"
+
+[Script]
+Tx = type=http-request,pattern=^(https:\/\/i\.video|http:\/\/iacc)\.qq\.com\/$,requires-body=0,max-size=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Js/Tx.js
