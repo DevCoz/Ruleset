@@ -6,11 +6,13 @@
 ^https?://api\.abema\.io/v\d/ip/check - reject
 
 # >> ByteDance
-^https?:\/\/.+/img\/ad\.union\.api\/ - reject
+^https?:\/\/.+/img\/ad\.union\/ - reject
+^https?:\/\/.+?\.snssdk\.com\/ad\/ - reject
+^https?:\/\/sf\d-ttcdn-tos\.pstatp\.com\/obj\/ad - reject
+^https?:\/\/api-access\.pangolin-sdk-toutiao\.com\/api\/ad\/ - reject
 
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
-//^https:\/\/firebaseremoteconfig\.googleapis\.com\/v1\/projects data="5044D94D.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, *doubanio.com, *.pglstatp-toutiao.com, firebaseremoteconfig.googleapis.com
+hostname = %APPEND% api.douban.com, *doubanio.com, *.pglstatp-toutiao.com, 
