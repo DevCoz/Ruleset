@@ -1,5 +1,5 @@
 #!name=ximalaya
-#!desc=ios
+#!desc=Noad
 
 [Rule]
 URL-REGEX,^http:\/\/adse\.ximalaya\.com\/(ting|adx)(?!preSale),REJECT 
