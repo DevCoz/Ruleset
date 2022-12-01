@@ -10,4 +10,4 @@ DOMAIN,gslbtx.ximalaya.com,REJECT
 ximalaya = type=http-response,pattern=^https?:\/\/mobile\.ximalaya\.com\/(discovery-feed|category|mobile-user)\/v\d\/(mix|category|homePage),requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/ddgksf2013/Scripts/master/xmly_json.js,script-update-interval=0
 
 [MITM]
-hostname = %APPEND% mobile.ximalaya.com
+hostname = %APPEND% *.xima*.*, *.xmcdn.*
