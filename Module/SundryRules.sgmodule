@@ -8,7 +8,7 @@
 # >> ByteDance
 ^https?:\/\/.+?\.snssdk\.com\/ad\/ - reject
 ^https?:\/\/sf\d-ttcdn-tos\.pstatp\.com\/obj\/ad - reject
-^https?:\/\/p\d-be-pack-sign\.pglstatp-toutiao\.com\/ad.union.api\/ - reject
+^https?:\/\/p\d-be-pack-sign\.pglstatp-toutiao\.com\/ad\.union\.api\/ - reject
 //^https?:\/\/api-access\.pangolin-sdk-toutiao\.com\/api\/ad\/ - reject
 
 [Map Local]
