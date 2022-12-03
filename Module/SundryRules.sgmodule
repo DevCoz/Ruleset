@@ -6,10 +6,10 @@
 ^https?://api\.abema\.io/v\d/ip/check - reject
 
 # >> ByteDance
-^https?:\/\/.+/img\/ad\.union\/ - reject
+^https?:\/\/.+?\.ad\.union\.api\/ - reject
 ^https?:\/\/.+?\.snssdk\.com\/ad\/ - reject
 ^https?:\/\/sf\d-ttcdn-tos\.pstatp\.com\/obj\/ad - reject
-^https?:\/\/api-access\.pangolin-sdk-toutiao\.com\/api\/ad\/ - reject
+//^https?:\/\/api-access\.pangolin-sdk-toutiao\.com\/api\/ad\/ - reject
 
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
