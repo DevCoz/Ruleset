@@ -9,7 +9,6 @@ force-http-engine-hosts = %APPEND% *.cp31.ott.cibntv.net,220.112*,211.162*,124.1
 DOMAIN,video-ad.sm.cn,REJECT-DROP
 DOMAIN,api.cupid.dns.iqiyi.com,REJECT
 DOMAIN-SUFFIX,cupid.iqiyi.com,REJECT
-AND,((PROTOCOL,HTTPS), (DOMAIN,iacc.qq.com)),REJECT-NO-DROP
 
 [URL Rewrite]
 http://.+\.cp31\.ott\.cibntv\.net - reject
