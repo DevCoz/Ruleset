@@ -20,7 +20,7 @@ http://(\d{1,3}\.){3}\d{1,3}/(variety|vlive\.qqvideo)\.tc\.qq\.com/ - reject
 ^https?:\/\/.+\.tc\.qq\.com\/.+mp4 data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject.mp4"
 
 [MITM]
-hostname = %APPEND% i.video.qq.com,iacc.qq.com
+hostname = %APPEND% i.video.qq.com, iacc.qq.com
 
 [Script]
 Tx = type=http-request,pattern=^(https:\/\/i\.video|http:\/\/iacc)\.qq\.com\/$,requires-body=0,max-size=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Js/Tx.js
