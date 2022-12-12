@@ -7,11 +7,24 @@
 
 # >> ByteDance
 ^https?:\/\/.+?\.snssdk\.com\/ad\/ - reject
+^https?:\/\/.+\.snssdk.com\/api\/ad\/.+ - reject
+^http:\/\/.+\.byteimg\.com\/ad-app-package - reject
+^http:\/\/.+\.byteimg\.com\/web\.business\.image - reject
 ^https?:\/\/sf\d-ttcdn-tos\.pstatp\.com\/obj\/ad - reject
+^https?:\/\/gurd\.snssdk\.com\/src\/server\/v3\/package - reject
+^https?:\/\/.+\.pglstatp-toutiao\.com\/.+\/toutiao\.mp4 - reject
+^https?:\/\/.+\.pstatp\.com\/obj\/mosaic-legacy\/.+\?from\=ad - reject
+^https?:\/\/.+\.snssdk\.com\/video\/play\/1\/toutiao\/.+\/mp4 - reject
+^https?:\/\/.+\.byteimg.com/tos-cn-i-1yzifmftcy\/(.+)-jpeg\.jpeg - reject
+^https?:\/\/.+\.pstatp\.com\/bytecom\/resource\/track_log\/src\/.+ - reject
 ^https?:\/\/p\d-be-pack-sign\.pglstatp-toutiao\.com\/ad\.union\.api\/ - reject
+^https?:\/\/.+\.(pglstatp-toutiao|pstatp)\.com\/obj\/ad-pattern\/renderer - reject
+^https?:\/\/.+\.(pglstatp-toutiao|pstatp)\.com\/(obj|img)\/(ad-app-package|ad)\/.+ - reject
+^https?:\/\/.+\.(pglstatp-toutiao|pstatp)\.com\/(obj|img)\/web\.business\.image\/.+ - reject
+^https?:\/\/.+\.pangolin-sdk-toutiao\.com\/api\/ad\/union\/sdk\/(get_ads|stats|settings)\/ - reject
 
 [Map Local]
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, *doubanio.com, sf?-ttcdn-tos.pstatp.com, p?-be-pack-sign.pglstatp-toutiao.com, *.snssdk.com, www.umeng.com, www.adview.cn, adview.cn
+hostname = %APPEND% api.douban.com, *doubanio.com, sf?-ttcdn-tos.pstatp.com, *.pangolin-sdk-toutiao, *.pangolin-sdk-toutiao.*, *.pstatp.com,*.pstatp.com.*, *.pglstatp-toutiao.com.*, *.pglstatp-toutiao.com, gurd.snssdk.com, gurd.snssdk.com.*, *default.ixigua.com
