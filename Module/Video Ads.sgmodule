@@ -23,7 +23,7 @@ http://.+\.cp31\.ott\.cibntv\.net - reject
 ^https?:\/\/.+\.tc\.qq\.com\/.+mp4 data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject.mp4"
 
 [MITM]
-hostname = %APPEND% i.video.qq.com, iacc.qq.com
+hostname = %APPEND% i.video.qq.com, iacc.qq.com, video.dispatch.tc.qq.com
 
 [Script]
 Tx = type=http-request,pattern=^(https:\/\/i\.video|http:\/\/iacc)\.qq\.com\/$,requires-body=0,max-size=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Js/Tx.js
