@@ -12,7 +12,10 @@ DOMAIN-SUFFIX,cupid.iqiyi.com,REJECT
 
 [URL Rewrite]
 http://.+\.cp31\.ott\.cibntv\.net - reject
-http://(\d{1,3}\.){3}\d{1,3}/(variety|vlive\.qqvideo)\.tc\.qq\.com/ - reject
+^http:\/\/wa\.gtimg\.com\/adxcdn\/.+\.jpg - reject
+^http:\/\/video\.dispatch\.tc\.qq\.com\/.+\.mp4 - reject
+^http:\/\/.+\/vmind\.qqvideo\.tc\.qq\.com\/.+\.mp4 - reject
+^http:\/\/.+/\?tk=9901afb195dcf9a34db6088a4a221dba38b3d980e4db86009f8a08be4d4099ee323f6e7f03b881db21133b1bf2ae5bc5 - reject
 
 # > 开屏
 [Map Local]
