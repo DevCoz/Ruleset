@@ -9,9 +9,12 @@ force-http-engine-hosts = %APPEND% *.cp31.ott.cibntv.net,220.112*,211.162*,124.1
 DOMAIN,video-ad.sm.cn,REJECT-DROP
 DOMAIN,api.cupid.dns.iqiyi.com,REJECT
 DOMAIN-SUFFIX,cupid.iqiyi.com,REJECT
+DOMAIN,httpdns.alicdn.com,REJECT
+URL-REGEX,^http:\/\/.*amdc\/mobile\wispatch,REJECT
+URL-REGEX,^http.*cp31\.ott\.cibntv\.net\/youku\/,REJECT-TINYGIF
+AND,((OR,((DEST-PORT,10003), (DEST-PORT,10001))), (PROTOCOL,UDP)),REJECT
 
 [URL Rewrite]
-http://.+\.cp31\.ott\.cibntv\.net - reject
 ^http:\/\/wa\.gtimg\.com\/adxcdn\/.+\.jpg - reject
 ^http:\/\/video\.dispatch\.tc\.qq\.com\/.+\.mp4 - reject
 ^http:\/\/.+\/vmind\.qqvideo\.tc\.qq\.com\/.+\.mp4 - reject
