@@ -8,8 +8,8 @@
 # >> ByteDance
 
 [Map Local]
-\/api-access\.pangolin-sdk-toutiao-b\.com data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
+\/api-access\.pangolin-sdk-toutiao-b\.com\/ data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, *doubanio.com
+hostname = %APPEND% api.douban.com, *doubanio.com, api-access.pangolin-sdk-toutiao-b.com
