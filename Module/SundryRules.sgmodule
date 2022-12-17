@@ -9,8 +9,7 @@
 
 [Map Local]
 \/api-access\.pangolin-sdk-toutiao-b\.com\/ data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
-^https?://+([^:/]+\.)?\/api\/ad\/union[/:?=&]?
-data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
+^https?://+([^:/]+\.)?\/api\/ad\/union[/:?=&]? data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 
 [MITM]
