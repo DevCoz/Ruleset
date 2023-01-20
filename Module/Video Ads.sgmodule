@@ -12,18 +12,11 @@ DOMAIN-SUFFIX,cupid.iqiyi.com,REJECT
 DOMAIN,httpdns.alicdn.com,REJECT
 URL-REGEX,^http:\/\/.*amdc\/mobile\wispatch,REJECT
 URL-REGEX,^http.*cp31\.ott\.cibntv\.net\/youku\/,REJECT-TINYGIF
-AND,((OR,((DEST-PORT,10003), (DEST-PORT,10001))), (PROTOCOL,UDP)),REJECT
-
-[URL Rewrite]
-^http:\/\/wa\.gtimg\.com\/adxcdn\/.+\.jpg - reject
-^http:\/\/video\.dispatch\.tc\.qq\.com\/.+\.mp4 - reject
-^http:\/\/.+\/vmind\.qqvideo\.tc\.qq\.com\/.+\.mp4 - reject
-^http:\/\/.+/\?tk=9901afb195dcf9a34db6088a4a221dba38b3d980e4db86009f8a08be4d4099ee323f6e7f03b881db21133b1bf2ae5bc5 - reject
+AND,((OR,((DEST-PORT,10003),(DEST-PORT,10001))),(PROTOCOL,UDP)),REJECT
 
 # > 开屏
 [Map Local]
-^https?:\/\/pgdt\.gtimg\.cn data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject.jpg"
-^https?:\/\/.+\.tc\.qq\.com\/.+mp4 data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject.mp4"
+^http:\/\/(.+qqvideo\.tc\.qq\.com\/.+mp4|pgdt\.gtimg\.cn) data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 
 [MITM]
 hostname = %APPEND% i.video.qq.com, iacc.qq.com, video.dispatch.tc.qq.com
