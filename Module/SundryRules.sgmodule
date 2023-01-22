@@ -5,8 +5,6 @@
 # AbeamTV Unlock
 ^https?://api\.abema\.io/v\d/ip/check - reject
 
-# >> ByteDance
-
 [Map Local]
 \/api-access\.pangolin-sdk-toutiao-b\.com\/ data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 \/api\/ad\/union data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
