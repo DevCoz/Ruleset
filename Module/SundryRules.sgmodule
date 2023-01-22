@@ -5,10 +5,13 @@
 # AbeamTV Unlock
 ^https?://api\.abema\.io/v\d/ip/check - reject
 
+# XiMaLaYa
+^https?:\/\/(adse\.wsa|adse|adbehavior|xdcs-collector)\.xima.*\.com\/.* - reject
+
 [Map Local]
 \/api-access\.pangolin-sdk-toutiao-b\.com\/ data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 \/api\/ad\/union data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 ^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, *doubanio.com, api-access.pangolin-sdk-toutiao-b.com
+hostname = %APPEND% api.douban.com, *doubanio.com, api-access.pangolin-sdk-toutiao-b.com, *.xima*.*, *.xmcdn.*
