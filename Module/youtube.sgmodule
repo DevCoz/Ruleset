@@ -1,8 +1,6 @@
-#!name=YouTube
-##!name=去除 Youtube 广告 
+#!name=去除 Youtube 广告 
 #!desc=去除 Youtube 广告（Beta）
-# IOS >= 15
-# 删除 瀑布流、视频、搜索中出现的广告和Shorts，
+# 删除 瀑布流、视频、搜索中出现的广告和Shorts
 # 删除 Shorts 内的视频广告
 # 删除 底部 上传 按钮
 # 增加 画中画(PIP)
