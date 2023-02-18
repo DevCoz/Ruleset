@@ -13,4 +13,4 @@
 is\.snssdk\.com|mi\.gdt\.qq\.com|open\.e\.kuaishou\.com|pangolin-sdk-toutiao\.com|pangolin-sdk-toutiao-b\.com data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, *.pangolin-sdk-toutiao-b.com, icc.one
+hostname = %APPEND% api.douban.com, *.pangolin-sdk-toutiao-b.com, icc.one, *.xima*.*, *.xmcdn.*
