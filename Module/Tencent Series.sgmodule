@@ -1,6 +1,14 @@
 #!name=Tencent Series
 #!desc=Tencent Video Ads.
+
 [Rule]
+DOMAIN,pgdt.gtimg.com,REJECT
+DOMAIN,pgdt.gtimg.cn,REJECT
+DOMAIN,pgdt.ugdtimg.com,REJECT
+DOMAIN,wa.gtimg.com,REJECT
+DOMAIN-SUFFIX,e.qq.com,REJECT
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+DOMAIN-SUFFIX,l.qq.com,REJECT
 DOMAIN,h.trace.qq.com,REJECT
 DOMAIN-SUFFIX,tetrack.qq.com,REJECT
 DOMAIN-SUFFIX,tpns.tencent.com,REJECT
