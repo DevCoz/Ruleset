@@ -1,10 +1,14 @@
 #!name= SundryRules
 #!desc= Sundry Module.
 
+[Rule]
+# > 腾讯视频 去开屏
+IP-CIDR,47.110.187.87/32,REJECT
+OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0/0,no-resolve)))),REJECT-DROP
+
 [URL Rewrite]
 # AbeamTV Unlock
 ^https?://api\.abema\.io/v\d/ip/check - reject
-
 ^https?:\/\/icc\.one\/iFreeTime\/xid32uxaoecnfv2\/ - reject
 
 [Map Local]
