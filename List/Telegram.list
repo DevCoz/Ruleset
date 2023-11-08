@@ -1,4 +1,15 @@
 # Telegram
+
+DOMAIN-SUFFIX,t.me
+DOMAIN-SUFFIX,tx.me
+DOMAIN-SUFFIX,tdesktop.com
+DOMAIN-SUFFIX,telegra.ph
+DOMAIN-SUFFIX,telegram.me
+DOMAIN-SUFFIX,telegram.org
+DOMAIN-SUFFIX,graph.org
+DOMAIN-SUFFIX,legra.ph
+DOMAIN-SUFFIX,telesco.pe
+
 IP-CIDR,5.28.192.0/18,no-resolve
 IP-CIDR,91.108.56.0/22,no-resolve
 IP-CIDR,91.108.4.0/22,no-resolve
