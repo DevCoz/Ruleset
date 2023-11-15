@@ -4,6 +4,8 @@
 [Rule]
 DOMAIN-KEYWORD,dns,REJECT-NO-DROP,extended-matching
 
+URL-REGEX,^http:\/\/.*\/resolve\?host=.*$,REJECT
+
 # > 腾讯视频 去开屏
 IP-CIDR,47.110.187.87/32,REJECT,no-resolve
 OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0/0,no-resolve)))),REJECT-DROP
