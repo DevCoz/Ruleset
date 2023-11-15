@@ -1,8 +1,0 @@
-#!name=Block QUIC
-#!desc=Block YouTube/Bilibili/Douyu P2P CDN
-[Rule]
-# Block YouTube QUIC
-AND,((PROTOCOL,UDP), (DOMAIN-SUFFIX,googlevideo.com)),REJECT-NO-DROP
-# Block Bilibili/Douyu P2P CDN
-AND,((PROTOCOL,UDP), (OR,((DOMAIN-KEYWORD,bilibili), (DOMAIN-KEYWORD,biliapi), (DOMAIN-KEYWORD,mcdn), (DOMAIN-KEYWORD,douyu)))),REJECT-NO-DROP
-AND,((PROTOCOL,TCP), (OR,((DOMAIN-KEYWORD,stun), (DOMAIN-KEYWORD,douyu)))),REJECT-NO-DROP
