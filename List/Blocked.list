@@ -24,7 +24,6 @@ DOMAIN-SUFFIX,googleapis.cn
 DOMAIN-KEYWORD,google
 DOMAIN-SUFFIX,gmail.com
 DOMAIN-KEYWORD,blogspot
-DOMAIN-SUFFIX,xn--ngstr-lra8j.com
 
 # >> Other
 DOMAIN-SUFFIX,fb.me
@@ -32,6 +31,5 @@ DOMAIN-SUFFIX,fbcdn.net
 DOMAIN-SUFFIX,twimg.com
 DOMAIN-SUFFIX,pinimg.com
 DOMAIN-SUFFIX,pixiv.net
-DOMAIN-SUFFIX,reddit.com
-DOMAIN-SUFFIX,redgifs.com
-DOMAIN-SUFFIX,redditmedia.com
+DOMAIN-SUFFIX,18comic.vip
+DOMAIN-SUFFIX,18comic.org
