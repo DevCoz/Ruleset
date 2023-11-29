@@ -2,7 +2,7 @@
 #!desc= Sundry Module.
 
 [Rule]
-DOMAIN-KEYWORD,dns,REJECT-NO-DROP,extended-matching
+DOMAIN-KEYWORD,httpdns,REJECT-NO-DROP,extended-matching
 
 URL-REGEX,^http:\/\/.*\/resolve\?host=.*$,REJECT
 
