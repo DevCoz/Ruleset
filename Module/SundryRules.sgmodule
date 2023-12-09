@@ -18,5 +18,4 @@ DOMAIN,config.ab.qq.com,REJECT
 ^https?://api\.abema\.io/v\d/ip/check - reject
 
 [Map Local]
-\/api\/ad\/union data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
-^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
+https://mp\.weixin\.qq\.com/mp/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
