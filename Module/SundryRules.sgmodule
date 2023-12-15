@@ -3,9 +3,6 @@
 
 [Rule]
 DOMAIN-KEYWORD,httpdns,REJECT-NO-DROP,extended-matching
-
-URL-REGEX,^http:\/\/.*\/resolve\?host=.*$,REJECT
-
 # > 腾讯视频 去开屏
 IP-CIDR,47.110.187.87/32,REJECT,no-resolve
 OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0/0,no-resolve)))),REJECT-DROP
@@ -16,6 +13,21 @@ DOMAIN,config.ab.qq.com,REJECT
 [URL Rewrite]
 # AbeamTV Unlock
 ^https?://api\.abema\.io/v\d/ip/check - reject
+# 豆瓣 //api.douban.com
+^https:\/\/api\.douban\.com\/v2\/app_ads\/splash - reject
+^https:\/\/api\.douban\.com\b.*\/common_ads\? - reject
+
+# 美团 & 美团外卖//flowplus.meituan.net, img.meituan.net, s3plus.meituan.net
+^http:\/\/wmapi\.meituan\.com\/api\/v7\/(loadInfo|openscreen|startpicture)\? - reject
+^https:\/\/flowplus\.meituan\.net\/v1\/mss_\w+\/linglong\/\d+\.jpg - reject
+^https:\/\/img\.meituan\.net\/bizad\/bizad_brandCpt_\d+\.jpg - reject
+^https:\/\/s3plus\.meituan\.net\/v1\/mss_\w+\/(brandcpt-vedio|waimai-alita)\/\w+\.zip$ - reject
+
+# 云闪付 //wallet.95516.com
+^https:\/\/wallet\.95516\.com(:10533)?\/s\/wl\/icon\/large\/1 - reject
 
 [Map Local]
 https://mp\.weixin\.qq\.com/mp/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
+
+[MITM]
+hostname = %APPEND% api.douban.com, flowplus.meituan.net, img.meituan.net, s3plus.meituan.net, wallet.95516.com
