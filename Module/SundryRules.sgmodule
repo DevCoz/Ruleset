@@ -1,5 +1,6 @@
 #!name= SundryRules
 #!desc= Sundry Module.
+#!category=SAM
 
 [Rule]
 # > 腾讯视频 去开屏
