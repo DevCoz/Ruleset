@@ -26,9 +26,8 @@ OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0
 ^https:\/\/wallet\.95516\.com(:10533)?\/s\/wl\/icon\/large\/1 - reject
 
 [Map Local]
-\/api\/ad\/union data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
+\/api\/ad\/union data-type=text data="{}" status-code=500
 https://mp\.weixin\.qq\.com/mp/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
-pangolin-sdk-toutiao\.com|pangolin-sdk-toutiao-b\.com data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/reject-dict.json"
 
 [MITM]
 hostname = %APPEND% api.douban.com, flowplus.meituan.net, img.meituan.net, s3plus.meituan.net, wallet.95516.com
