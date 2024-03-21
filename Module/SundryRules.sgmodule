@@ -30,4 +30,4 @@ OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0
 https://mp\.weixin\.qq\.com/mp/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 
 [MITM]
-hostname = %APPEND% api.douban.com, flowplus.meituan.net, img.meituan.net, s3plus.meituan.net, wallet.95516.com, *pangolin-sdk-toutiao*com, ssp.soulapp.cn
+hostname = %APPEND% api.douban.com, flowplus.meituan.net, img.meituan.net, s3plus.meituan.net, wallet.95516.com, ssp.soulapp.cn
