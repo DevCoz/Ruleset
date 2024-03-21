@@ -27,9 +27,6 @@ OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0
 
 [Map Local]
 ^https:\/\/ssp\.soulapp\.cn\/api\/q\? data-type=text data="{}"
-^https?:\/\/.+?\.pangolin-sdk-toutiao.*?\.com\/api\/ad data-type=text data="{}"
-^https?:\/\/api-access\.pangolin-sdk-toutiao(\d|-\w)?\.com\/api\/ad\/union\/sdk\/stats\/batch\/\? data-type=text data="{}"
-^https:\/\/api-access\.pangolin-sdk-toutiao(\d|-\w)?\.com\/api\/ad\/union\/sdk\/get_ads data-type=text data="{}"
 https://mp\.weixin\.qq\.com/mp/getappmsgad data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 
 [MITM]
