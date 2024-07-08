@@ -1,0 +1,8 @@
+#!name=Picsew
+#!desc=Unlock Picsew
+
+[Map Local]
+^https:\/\/buy\.itunes\.apple\.com\/verifyReceipt data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/Json/Picsew.json"
+
+[MITM]
+hostname = %APPEND% buy.itunes.apple.com

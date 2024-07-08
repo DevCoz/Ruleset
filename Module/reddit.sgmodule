@@ -1,0 +1,10 @@
+#!name=Reddit去广告
+#!desc=过滤应用内推广，阻止NSFW提示。
+#!author=xream
+#!category=SAM
+
+[Script]
+移除广告 = type=http-response, pattern=^https?:\/\/gql(-fed)?\.reddit\.com, script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Js/reddit.js, requires-body=true
+
+[MITM]
+hostname = %APPEND% gql.reddit.com, gql-fed.reddit.com

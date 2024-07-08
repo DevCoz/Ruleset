@@ -1,0 +1,10 @@
+#!name=Weibo
+#!desc=remove ads
+#!category=SAM
+
+[Map Local]
+^https:\/\/api\.weibo\.cn\/2\/ad\/weibointl data-type=text data="{}"
+^https:\/\/weibointl\.api\.weibo\.cn\/portal\.php\?a=get_coopen_ads data-type=text data="{"data":{"display_ad":0}}" header="content-type: application/json"
+
+[MITM]
+hostname = %APPEND% api.weibo.cn, weibointl.api.weibo.cn
