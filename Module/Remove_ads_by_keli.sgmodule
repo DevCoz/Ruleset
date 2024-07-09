@@ -1,33 +1,32 @@
 #!name=广告过滤器
 #!desc=去广告合集\n作者：@可莉🅥
 #!category=去广告
-#!homepage=https://gitlab.com/lodepuly/vpn_tool/-/tree/master/Tool/Loon/Plugin
-#!date=2024-05-24 17:07:17
 
 [Rule]
 # 广告联盟放行
-URL-REGEX,^https:\/\/(api-access\.pangolin-sdk-toutiao(\d|-b)?|is\.snssdk)\.com\/api\/ad\/union\/sdk\/get_ads,DIRECT
-URL-REGEX,^https:\/\/open\.e\.kuaishou\.com\/rest\/e\/v3\/open\/univ$,DIRECT
-URL-REGEX,^https:\/\/mi\.gdt\.qq\.com\/gdt_mview\.fcg\?,DIRECT
+URL-REGEX, ^https:\/\/(api-access\.pangolin-sdk-toutiao(\d|-b)?|is\.snssdk)\.com\/api\/ad\/union\/sdk\/get_ads, DIRECT // 放行此条以确保字节跳动去广告脚本的正常执行
+URL-REGEX, ^https:\/\/open\.e\.kuaishou\.com\/rest\/e\/v3\/open\/univ$, DIRECT // 放行此条以确保快手联盟去广告脚本的正常执行
+URL-REGEX, ^https:\/\/mi\.gdt\.qq\.com\/gdt_mview\.fcg\?, DIRECT // 放行此条以确保腾讯优量汇去广告脚本的正常执行
+
 # 字节跳动广告
-AND,((DOMAIN-KEYWORD, ads), (DOMAIN-KEYWORD, normal), (DOMAIN-SUFFIX, zijieapi.com)),REJECT
-AND,((DOMAIN-KEYWORD, -ad-), (DOMAIN-SUFFIX, byteimg.com)),REJECT
-AND,((DOMAIN-KEYWORD, minigame), (DOMAIN-SUFFIX, zijieapi.com)),REJECT
-AND,((DOMAIN-KEYWORD, tnc), (AND, ((OR, ((DOMAIN-KEYWORD, -bjlgy), (DOMAIN-KEYWORD, -alisc), (DOMAIN-KEYWORD, -aliec))), (OR, ((DOMAIN-SUFFIX, snssdk.com), (DOMAIN-SUFFIX, toutiaoapi.com), (DOMAIN-SUFFIX, bytedance.com), (DOMAIN-SUFFIX, zijieapi.com)))))),REJECT
-AND,((DOMAIN-KEYWORD, log-api.pangolin-sdk-toutiao), (DOMAIN-SUFFIX, .com)),REJECT
-DOMAIN,toblog.ctobsnssdk.com,REJECT
-DOMAIN,mssdk-bu.bytedance.com,REJECT
-DOMAIN-KEYWORD,-be-pack-sign.pglstatp-toutiao.com,REJECT
+AND, ((DOMAIN-KEYWORD, ads), (DOMAIN-KEYWORD, normal), (DOMAIN-SUFFIX, zijieapi.com)), REJECT
+AND, ((DOMAIN-KEYWORD, -ad-), (DOMAIN-SUFFIX, byteimg.com)), REJECT
+AND, ((DOMAIN-KEYWORD, minigame), (DOMAIN-SUFFIX, zijieapi.com)), REJECT
+AND, ((DOMAIN-KEYWORD, tnc), (AND, ((OR, ((DOMAIN-KEYWORD, -bjlgy), (DOMAIN-KEYWORD, -alisc), (DOMAIN-KEYWORD, -aliec))), (OR, ((DOMAIN-SUFFIX, snssdk.com), (DOMAIN-SUFFIX, toutiaoapi.com), (DOMAIN-SUFFIX, bytedance.com), (DOMAIN-SUFFIX, zijieapi.com)))))), REJECT // 拦截HTTPDNS
+DOMAIN, mon.zijieapi.com, REJECT
+DOMAIN, mssdk-bu.bytedance.com, REJECT
+DOMAIN, toblog.ctobsnssdk.com, REJECT
+DOMAIN, lf-cdn-tos.bytescm.com, REJECT
+DOMAIN-KEYWORD, -ad-sign.byteimg.com, REJECT
+DOMAIN-KEYWORD, -be-pack-sign.pglstatp-toutiao.com, REJECT
+DOMAIN-KEYWORD, -be-pack.pglstatp-toutiao.com, REJECT
+DOMAIN-KEYWORD, -fe-tos.pglstatp-toutiao.com, REJECT
+DOMAIN-KEYWORD, api-access.pangolin-sdk-toutiao, REJECT
+DOMAIN-KEYWORD, log-api.pangolin-sdk-toutiao, REJECT
+
+
 # 快手联盟 - 广告服务商
 DOMAIN,open.e.kuaishou.com,REJECT
-# 秒针系统 - 广告服务商
-DOMAIN-SUFFIX,miaozhen.com,REJECT
-# 达佳互联 - 广告服务商
-DOMAIN-SUFFIX,adukwai.com,REJECT
-# 艾狄墨搏 - 广告服务商
-DOMAIN,monitor.ssp.admobile.top,REJECT
-DOMAIN,sdk.ssp.admobile.top,REJECT
-DOMAIN-SUFFIX,admobile.top,REJECT
 # 极光 - 广告服务商
 DOMAIN-SUFFIX,jiguang.cn,REJECT
 # 百度联盟 - 广告服务商
@@ -66,6 +65,11 @@ DOMAIN, maplocatesdksnapshot.d.meituan.net, REJECT
 DOMAIN, metrics-picture.d.meituan.net, REJECT
 DOMAIN, route-stats.d.meituan.net, REJECT
 
+# 虎牙直播开屏广告
+DOMAIN, business.msstatic.com, REJECT
+DOMAIN-SUFFIX, v1d.szbdyd.com, REJECT
+URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
+
 [URL Rewrite]
 # 拼多多 //api.pinduoduo.com, api.yangkeduo.com
 ^https:\/\/api\.(pinduoduo|yangkeduo)\.com\/api\/cappuccino\/splash - reject
@@ -86,4 +90,4 @@ DOMAIN, route-stats.d.meituan.net, REJECT
 # 腾讯优量汇
 移除腾讯优量汇广告 = type=http-response, pattern=^https:\/\/mi\.gdt\.qq\.com\/gdt_mview\.fcg\?, script-path=https://gitlab.com/lodepuly/vpn_tool/-/raw/master/Resource/Script/Remove_ads_by_keli/adsense.js, requires-body=true
 [MITM]
-hostname = %APPEND% api-access.pangolin-sdk-toutiao*.com, is.snssdk.com, sf3-fe-tos.pglstatp-toutiao.com, ether-pack.pangolin-sdk-toutiao.com, lf3-analytics.bytescm.com, mi.gdt.qq.com, open.e.kuaishou.com
+hostname = %APPEND% api-access.pangolin-sdk-toutiao*.com, is.snssdk.com, sf3-fe-tos.pglstatp-toutiao.com, ether-pack.pangolin-sdk-toutiao.com, lf3-analytics.bytescm.com, mi.gdt.qq.com, open.e.kuaishou.com, cdn.wup.huya.com
