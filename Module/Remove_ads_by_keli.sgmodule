@@ -65,11 +65,6 @@ DOMAIN, maplocatesdksnapshot.d.meituan.net, REJECT
 DOMAIN, metrics-picture.d.meituan.net, REJECT
 DOMAIN, route-stats.d.meituan.net, REJECT
 
-# 虎牙直播开屏广告
-DOMAIN, business.msstatic.com, REJECT
-DOMAIN-SUFFIX, v1d.szbdyd.com, REJECT
-URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
-
 [URL Rewrite]
 # 拼多多 //api.pinduoduo.com, api.yangkeduo.com
 ^https:\/\/api\.(pinduoduo|yangkeduo)\.com\/api\/cappuccino\/splash - reject
@@ -90,4 +85,4 @@ URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
 # 腾讯优量汇
 移除腾讯优量汇广告 = type=http-response, pattern=^https:\/\/mi\.gdt\.qq\.com\/gdt_mview\.fcg\?, script-path=https://gitlab.com/lodepuly/vpn_tool/-/raw/master/Resource/Script/Remove_ads_by_keli/adsense.js, requires-body=true
 [MITM]
-hostname = %APPEND% api-access.pangolin-sdk-toutiao*.com, is.snssdk.com, sf3-fe-tos.pglstatp-toutiao.com, ether-pack.pangolin-sdk-toutiao.com, lf3-analytics.bytescm.com, mi.gdt.qq.com, open.e.kuaishou.com, cdn.wup.huya.com
+hostname = %APPEND% api-access.pangolin-sdk-toutiao*.com, is.snssdk.com, sf3-fe-tos.pglstatp-toutiao.com, ether-pack.pangolin-sdk-toutiao.com, lf3-analytics.bytescm.com, mi.gdt.qq.com, open.e.kuaishou.com
