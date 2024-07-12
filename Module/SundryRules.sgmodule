@@ -26,8 +26,8 @@ URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
 
 [Map Local]
 https://mp\.weixin\.qq\.com/mp/getappmsgad data-type=file data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
-^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
+//^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 ^https?:\/\/iphone\.ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) data-type=text data=" " status-code=200
 
 [MITM]
-hostname = %APPEND% api.douban.com,api.kkmh.com,iphone.ac.qq.com,mp.weixin.qq.com, goblin.hupu.com
+hostname = %APPEND% api.douban.com,api.kkmh.com,mp.weixin.qq.com, goblin.hupu.com
