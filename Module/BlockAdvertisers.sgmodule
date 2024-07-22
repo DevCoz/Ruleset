@@ -1,7 +1,6 @@
 #!name=广告平台拦截器
-#!desc=拦截广告。
-#!category=去广告, 可莉🅥
-
+#!desc=拦截广告&可莉🅥。
+#!category=去广告
 [Rule]
 AND, ((DOMAIN-KEYWORD, -ad-), (DOMAIN-SUFFIX, byteimg.com)), REJECT
 AND, ((DOMAIN-KEYWORD, -sign-), (DOMAIN-SUFFIX, tiktokcdn.com)), REJECT
