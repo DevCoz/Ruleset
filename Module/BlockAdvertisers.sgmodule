@@ -1,7 +1,7 @@
 #!name=广告平台拦截器
 #!desc=拦截广告&可莉🅥。
 #!category=去广告
-#!date=2024-08-03
+#!date=2024-08-10
 
 [Rule]
 AND, ((DOMAIN-KEYWORD, -ad-), (DOMAIN-SUFFIX, byteimg.com)), REJECT
@@ -119,7 +119,6 @@ DOMAIN,info4.video.qq.com,REJECT
 DOMAIN,info6.video.qq.com,REJECT
 DOMAIN,ios.bugly.qq.com,REJECT
 DOMAIN,ios.video.mpush.qq.com,REJECT
-# DOMAIN, mazu.m.qq.com, REJECT // 误杀
 DOMAIN,mi.gdt.qq.com,REJECT
 DOMAIN,otheve.beacon.qq.com,REJECT
 DOMAIN,pgdt.gtimg.cn,REJECT
@@ -193,6 +192,8 @@ DOMAIN,adx-bj.anythinktech.com,REJECT
 DOMAIN,api.anythinktech.com,REJECT
 DOMAIN,tk.anythinktech.com,REJECT
 DOMAIN,da.anythinktech.com,REJECT
+# 小米
+DOMAIN,sdkconfig.ad.xiaomi.com,REJECT
 # 美团
 DOMAIN,al-log.d.meituan.net,REJECT
 DOMAIN,babel-statistics-android.d.meituan.net,REJECT
