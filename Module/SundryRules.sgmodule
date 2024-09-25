@@ -25,9 +25,17 @@ URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
 ^https:\/\/api\.douban\.com\b.*\/common_ads\? - reject
 
 [Map Local]
-https://mp\.weixin\.qq\.com/mp/getappmsgad data-type=file data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
-//^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
+//https://mp\.weixin\.qq\.com/mp/getappmsgad data-type=file data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
+^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 ^https?:\/\/iphone\.ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) data-type=text data=" " status-code=200
 
+# IP 与地理位置
+^https:\/\/api\.bilibili\.com\/x\/web-interface\/zone\?jsonp data-type=text data="{}" status-code=200
+^https:\/\/app\.bilibili\.com\/x\/resource\/ip data-type=text data="{}" status-code=200
+# 开屏广告 //app.bilibili.com
+^http:\/\/[\d\.]+:8000\/v1\/resource\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
+^http:\/\/upos-sz-static\.bilivideo\.com\/ssaxcode\/\w{2}\/\w{2}\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
+^https:\/\/(api\.bilibili\.com\/x\/mengqi\/v1\/resource|app\.bilibili\.com\/x\/resource\/peak\/download) data-type=text data="{}" status-code=200
+
 [MITM]
-hostname = %APPEND% api.douban.com,api.kkmh.com,mp.weixin.qq.com, goblin.hupu.com
+hostname = %APPEND% api.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, cdn.wup.huya.com, ossgw.alicdn.com
