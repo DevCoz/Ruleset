@@ -21,21 +21,23 @@ URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
 
 [URL Rewrite]
 # 豆瓣 //api.douban.com
-^https:\/\/api\.douban\.com\/v2\/app_ads\/splash - reject
+//^https:\/\/api\.douban\.com\/v2\/app_ads\/splash - reject
 ^https:\/\/api\.douban\.com\b.*\/common_ads\? - reject
 
 [Map Local]
+# 开屏广告  //api.douban.com
+^https:\/\/api\.douban\.com\/v\d\/app_ads\/splash data-type=text data="{}" status-code=200
+^https:\/\/m\.douban\.com\/rexxar\/api\/v\d\/market\/products\/ data-type=text data="{}" status-code=200
+^https:\/\/frodo\.douban\.com\/api\/v\d\/movie\/ad data-type=text data="{}" status-code=200
+
 //https://mp\.weixin\.qq\.com/mp/getappmsgad data-type=file data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 ^https?:\/\/iphone\.ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) data-type=text data=" " status-code=200
 
-# IP 与地理位置
-^https:\/\/api\.bilibili\.com\/x\/web-interface\/zone\?jsonp data-type=text data="{}" status-code=200
-^https:\/\/app\.bilibili\.com\/x\/resource\/ip data-type=text data="{}" status-code=200
 # 开屏广告 //app.bilibili.com
 ^http:\/\/[\d\.]+:8000\/v1\/resource\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
 ^http:\/\/upos-sz-static\.bilivideo\.com\/ssaxcode\/\w{2}\/\w{2}\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
 ^https:\/\/(api\.bilibili\.com\/x\/mengqi\/v1\/resource|app\.bilibili\.com\/x\/resource\/peak\/download) data-type=text data="{}" status-code=200
 
 [MITM]
-hostname = %APPEND% api.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, cdn.wup.huya.com, ossgw.alicdn.com
+hostname = %APPEND% api.douban.com, frodo.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, cdn.wup.huya.com, ossgw.alicdn.com
