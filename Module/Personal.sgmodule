@@ -19,11 +19,6 @@ DOMAIN, business.msstatic.com, REJECT
 DOMAIN-SUFFIX, v1d.szbdyd.com, REJECT
 URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
 
-[URL Rewrite]
-# 豆瓣 //api.douban.com
-//^https:\/\/api\.douban\.com\/v2\/app_ads\/splash - reject
-^https:\/\/api\.douban\.com\b.*\/common_ads\? - reject
-
 [Map Local]
 # 开屏广告  //api.douban.com
 ^https:\/\/api\.douban\.com\/v\d\/app_ads\/splash data-type=text data="{}" status-code=200
