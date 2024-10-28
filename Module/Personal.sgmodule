@@ -3,7 +3,7 @@
 #!category=SAM
 
 [Rule]
-# 腾讯视频 去开屏
+# 腾讯视频开屏广告
 URL-REGEX,^https:\/\/ossgw\.alicdn\.com\/creatives-assets/prod/feupload/user,REJECT
 IP-CIDR,47.110.187.87/32,REJECT,no-resolve
 OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0/0,no-resolve)))),REJECT-DROP
@@ -19,22 +19,22 @@ DOMAIN, business.msstatic.com, REJECT
 DOMAIN-SUFFIX, v1d.szbdyd.com, REJECT
 URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
 
+# 纵横小说开屏广告
+^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$ - reject
+
 [Map Local]
 # 开屏广告  //api.douban.com
 ^https:\/\/api\.douban\.com\/v\d\/app_ads\/splash data-type=text data="{}" status-code=200
-# 信息流广告
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/erebor\/feed_ad data-type=text data="{}" status-code=200
-# 电影板块广告
 ^https:\/\/m\.douban\.com\/rexxar\/api\/v\d\/market\/products\/ data-type=text data="{}" status-code=200
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/movie\/ad data-type=text data="{}" status-code=200
-# 首页横幅
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/home_banner data-type=text data="{}" status-code=200
-# 搜索填充词
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/search\/found_words data-type=text data="{}" status-code=200
 
-//https://mp\.weixin\.qq\.com/mp/getappmsgad data-type=file data="https://raw.githubusercontent.com/DevCoz/Ruleset/Pv/Mock/WeChat.json"
+# 微信
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 ^https?:\/\/iphone\.ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) data-type=text data=" " status-code=200
+^https?:\/\/vv\.video\.qq\.com\/(diff|get)vmind data-type=text data="{}" status-code=200
 
 # 开屏广告 //app.bilibili.com
 ^http:\/\/[\d\.]+:8000\/v1\/resource\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
@@ -42,4 +42,4 @@ URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
 ^https:\/\/(api\.bilibili\.com\/x\/mengqi\/v1\/resource|app\.bilibili\.com\/x\/resource\/peak\/download) data-type=text data="{}" status-code=200
 
 [MITM]
-hostname = %APPEND% api.douban.com, frodo.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, cdn.wup.huya.com, ossgw.alicdn.com
+hostname = %APPEND% api.douban.com, frodo.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, cdn.wup.huya.com, ossgw.alicdn.com, vv.video.qq.com, api?.zongheng.com
