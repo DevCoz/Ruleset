@@ -1,7 +1,7 @@
 #!name=Soul
 #!desc=移除开屏广告、移除话题页面热Soul话题、移除评论区礼物榜、移除更新提示、移除青少年弹窗、移除我的页面推广、移除悬浮部件。
 #!author=ZenmoFeiShi RuCu6 可莉
-#!category=SAM
+#!category=BetaModule
 #!date=2024-10-15 10:53:02
 
 [Rule]
