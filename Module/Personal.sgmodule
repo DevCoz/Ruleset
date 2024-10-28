@@ -3,6 +3,11 @@
 #!category=SAM
 
 [Rule]
+# 云闪付开屏广告
+DOMAIN,ads.95516.com,REJECT,extended-matching,pre-matching
+DOMAIN,switch.cup.com.cn,REJECT,extended-matching,pre-matching
+DOMAIN,tysdk.95516.com,REJECT,extended-matching,pre-matching
+
 # 腾讯视频开屏广告
 URL-REGEX,^https:\/\/ossgw\.alicdn\.com\/creatives-assets/prod/feupload/user,REJECT
 IP-CIDR,47.110.187.87/32,REJECT,no-resolve
