@@ -20,12 +20,12 @@ URL-REGEX,^https?://api\.kkmh\.com/.+(ad|advertisement)/,REJECT
 URL-REGEX,^https://goblin\.hupu\.com/[^/]+/[^/]+/interfaceAd/,REJECT
 
 # 虎牙直播开屏广告
-DOMAIN, business.msstatic.com, REJECT
-DOMAIN-SUFFIX, v1d.szbdyd.com, REJECT
-URL-REGEX, ^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$, REJECT
+DOMAIN,business.msstatic.com, REJECT
+DOMAIN-SUFFIX,v1d.szbdyd.com, REJECT
+URL-REGEX,^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$,REJECT
 
 # 纵横小说开屏广告
-^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$ - reject
+URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 
 [Map Local]
 # 开屏广告  //api.douban.com
