@@ -22,7 +22,6 @@ URL-REGEX,^https://goblin\.hupu\.com/[^/]+/[^/]+/interfaceAd/,REJECT
 # 虎牙直播开屏广告
 DOMAIN,business.msstatic.com, REJECT
 DOMAIN-SUFFIX,v1d.szbdyd.com, REJECT
-URL-REGEX,^http:\/\/cdn\.wup\.huya\.com\/launch\/queryHttpDns$,REJECT
 
 # 纵横小说开屏广告
 URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
@@ -47,4 +46,4 @@ URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 ^https:\/\/(api\.bilibili\.com\/x\/mengqi\/v1\/resource|app\.bilibili\.com\/x\/resource\/peak\/download) data-type=text data="{}" status-code=200
 
 [MITM]
-hostname = %APPEND% api.douban.com, frodo.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, cdn.wup.huya.com, ossgw.alicdn.com, vv.video.qq.com, api?.zongheng.com
+hostname = %APPEND% api.douban.com, frodo.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, ossgw.alicdn.com, vv.video.qq.com, api?.zongheng.com
