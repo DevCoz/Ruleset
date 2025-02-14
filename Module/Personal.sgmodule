@@ -26,6 +26,20 @@ DOMAIN-SUFFIX,v1d.szbdyd.com, REJECT
 # 纵横小说开屏广告
 URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 
+[URL Rewrite]
+(?i)\b\/ad\/ - reject
+(?i)\b\/ads\/ - reject
+(?i)\b\/adv\/ - reject
+(?i)\b\/advert\/ - reject
+(?i)\b\/adx\/ - reject
+
+(?i)\b\/ad\? - reject
+(?i)\b\/ads\? - reject
+
+(?i)\badvertisement - reject
+(?i)\badvertising - reject
+(?i)\bsplash_screen - reject
+
 [Map Local]
 # 开屏广告  //api.douban.com
 ^https:\/\/api\.douban\.com\/v\d\/app_ads\/splash data-type=text data="{}" status-code=200
