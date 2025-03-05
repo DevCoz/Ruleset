@@ -1,9 +1,8 @@
 #!name=Soul去广告
-#!desc=移除开屏广告、移除话题页面热Soul话题、移除评论区礼物榜、移除更新提示、移除青少年弹窗、移除我的页面推广、移除悬浮部件。
+#!desc=移除广告。
 #!author=ZenmoFeiShi,RuCu6,可莉🅥
 #!category=BetaModule
 #!tag=去广告
-#!date=2024-11-28 00:00:00
 
 [Rule]
 DOMAIN-SUFFIX,soulapp.cn,DIRECT,extended-matching
