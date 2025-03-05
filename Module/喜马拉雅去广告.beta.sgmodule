@@ -5,7 +5,9 @@
 #!date=2025-02-14
 
 [URL Rewrite]
+# 拦截HTTPDNS
 ^https:\/\/gslbali\.ximalaya\.com\/linkeye-cloud\/httpdns\/ - reject
+# 拼多多广告平台
 ^https:\/\/video-dsp\.pddpic\.com\/market-dsp-video\/ - reject
 ^https:\/\/t-dsp\.pinduoduo\.com\/dspcb\/i\/mrk_union - reject
 ^https:\/\/images\.pinduoduo\.com\/mrk\/ - reject
@@ -22,33 +24,19 @@ http-response-jq ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/mobile-us
 
 [Map Local]
 ^https:\/\/(search|searchwsa)\.ximalaya\.com\/hub\/(guideWord|hotWord)V\d\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/discovery-feed\/v\d\/scene\/listen\/refresh\? data-type=text data="{}" status-code=200
-
 ^https:\/\/(m|mwsa)\.ximalaya\.com\/x-web-activity\/signIn\/getHomePageSignInInfo\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/subscribe\/v\d\/subscribe\/tagAlbumList$ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/track-feed\/v\d\/chase\/recommend\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/social-web\/follow-stream\/category\/\d+$ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/mobile-playpage\/playpage\/recommendContentV\d\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/mobile-playpage\/playpage\/recommend\/resource\/allocation\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/firework-portal\/v\d+\/sync\? data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/business-sale-promotion-guide-mobile-web\/popup\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/app-skin-service\/skin\/setting\/info\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(live|livewsa)\.ximalaya\.com\/lamia\/v1\/subscribe\/status$ data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/subscribe\/v\d\/subscribe\/recommend\? data-type=text data="{}" status-code=200
-
 ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/mobile-user\/v\d\/purchased\/recommend\/ data-type=text data="{}" status-code=200
-
 ^https:\/\/(m|mwsa)\.ximalaya\.com\/community\/square\/v\d\/stream\? data-type=text data="{"data":{"cards":[{"content":{},"type":"RECOMMENDS"}]},"ret":0}" status-code=200 header="Content-Type:text/json"
 
 [MITM]
