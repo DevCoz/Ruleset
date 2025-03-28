@@ -8,7 +8,11 @@ DOMAIN,ads.95516.com,REJECT,extended-matching,pre-matching
 DOMAIN,switch.cup.com.cn,REJECT,extended-matching,pre-matching
 DOMAIN,tysdk.95516.com,REJECT,extended-matching,pre-matching
 
-# 腾讯视频开屏广告
+# 腾讯广告
+DOMAIN-SUFFIX, wxs.qq.com, REJECT,extended-matching,pre-matching
+DOMAIN,wxsnsdy.wxs.qq.com,REJECT,extended-matching,pre-matching
+DOMAIN,wxsmsdy.video.qq.com,REJECT,extended-matching,pre-matching
+DOMAIN,wxsnsdythumb.wxs.qq.com,REJECT,extended-matching,pre-matching
 URL-REGEX,^https:\/\/ossgw\.alicdn\.com\/creatives-assets/prod/feupload/user,REJECT
 IP-CIDR,47.110.187.87/32,REJECT,no-resolve
 OR,((DOMAIN,pgdt.gtimg.cn), (AND,((USER-AGENT,live4iphoneRel*), (IP-CIDR,0.0.0.0/0,no-resolve)))),REJECT-DROP
@@ -49,10 +53,10 @@ URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/home_banner data-type=text data="{}" status-code=200
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/search\/found_words data-type=text data="{}" status-code=200
 
-# 微信
-^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
-^https?:\/\/iphone\.ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) data-type=text data=" " status-code=200
-^https?:\/\/vv\.video\.qq\.com\/(diff|get)vmind data-type=text data="{}" status-code=200
+
+# 微信移除公众号推广内容 //mp.weixin.qq.com
+^http:\/\/\w+\.wxs\.qq\.com\/\d+\/\d+\/(snscosdownload|snssvpdownload)\/(SH|SZ)\/reserved\/\w+ data-type=text data="{}" status-code=200
+^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|jsmonitor|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 
 # 开屏广告 //app.bilibili.com
 ^http:\/\/[\d\.]+:8000\/v1\/resource\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
