@@ -9,7 +9,7 @@ DOMAIN,switch.cup.com.cn,REJECT,extended-matching,pre-matching
 DOMAIN,tysdk.95516.com,REJECT,extended-matching,pre-matching
 
 # 腾讯广告
-DOMAIN-SUFFIX,wxs.qq.com, REJECT,extended-matching,pre-matching
+DOMAIN-SUFFIX,wxs.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN,wxsnsdy.wxs.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN,wxsmsdy.video.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN,wxsnsdythumb.wxs.qq.com,REJECT,extended-matching,pre-matching
@@ -23,8 +23,8 @@ URL-REGEX,^https?://api\.kkmh\.com/.+(ad|advertisement)/,REJECT
 URL-REGEX,^https://goblin\.hupu\.com/[^/]+/[^/]+/interfaceAd/,REJECT
 
 # 虎牙直播开屏广告
-DOMAIN,business.msstatic.com, REJECT
-DOMAIN-SUFFIX,v1d.szbdyd.com, REJECT
+DOMAIN,business.msstatic.com,REJECT
+DOMAIN-SUFFIX,v1d.szbdyd.com,REJECT
 
 # 纵横小说开屏广告
 URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
