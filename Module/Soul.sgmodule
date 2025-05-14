@@ -2,7 +2,6 @@
 #!desc=移除广告。
 #!author=ZenmoFeiShi,RuCu6,可莉🅥
 #!category=BetaModule
-#!tag=去广告
 
 [Rule]
 DOMAIN-SUFFIX,soulapp.cn,DIRECT,extended-matching
