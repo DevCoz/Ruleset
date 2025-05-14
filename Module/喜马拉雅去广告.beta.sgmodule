@@ -3,12 +3,12 @@
 #!author=可莉🅥
 #!category=BetaModule
 
-[URL Rewrite]
-^https:\/\/gslbali\.ximalaya\.com\/linkeye-cloud\/httpdns\/ - reject
-^https:\/\/video-dsp\.pddpic\.com\/market-dsp-video\/ - reject
-^https:\/\/t-dsp\.pinduoduo\.com\/dspcb\/i\/mrk_union - reject
-^https:\/\/images\.pinduoduo\.com\/mrk\/ - reject
-^https:\/\/images\.pinduoduo\.com\/marketing_api\/ - reject
+[Rule]
+DOMAIN,adse.ximalaya.com,REJECT,extended-matching,pre-matching
+DOMAIN,adsehera.ximalaya.com,REJECT,extended-matching,pre-matching
+DOMAIN,adse.wsa.ximalaya.com,REJECT,extended-matching,pre-matching
+DOMAIN,adbehavior.ximalaya.com,REJECT,extended-matching,pre-matching
+DOMAIN,adbehavior.wsa.ximalaya.com,REJECT,extended-matching,pre-matching
 
 [Body Rewrite]
 http-response-jq ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/discovery-feed\/v\d\/mix\/ '.heData |= map(select(.item.list[].bizType != "SceneListenCard"))'
@@ -37,4 +37,4 @@ http-response-jq ^https:\/\/(mobile|mobilehera|mobwsa)\.ximalaya\.com\/mobile-us
 ^https:\/\/(m|mwsa)\.ximalaya\.com\/community\/square\/v\d\/stream\? data-type=text data="{"data":{"cards":[{"content":{},"type":"RECOMMENDS"}]},"ret":0}" status-code=200 header="Content-Type:text/json"
 
 [MITM]
-hostname = %APPEND% gslbali.ximalaya.com, search.ximalaya.com, searchwsa.ximalaya.com, mobile.ximalaya.com, mobilehera.ximalaya.com, mobwsa.ximalaya.com, m.ximalaya.com, mwsa.ximalaya.com, video-dsp.pddpic.com, t-dsp.pinduoduo.com, images.pinduoduo.com
+hostname = %APPEND% gslbali.ximalaya.com, search.ximalaya.com, searchwsa.ximalaya.com, mobile.ximalaya.com, mobilehera.ximalaya.com, mobwsa.ximalaya.com, m.ximalaya.com, mwsa.ximalaya.com
