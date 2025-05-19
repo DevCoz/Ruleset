@@ -58,7 +58,6 @@ URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 # 腾讯移除推广内容 //mp.weixin.qq.com
 ^https?:\/\/vv\.video\.qq\.com\/(diff|get)vmind data-type=text data="{}" status-code=200
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/relatedsearchword data-type=text data="{}" status-code=200
-^http:\/\/\w+\.wxs\.qq\.com\/\d+\/\d+\/(snscosdownload|snssvpdownload)\/(SH|SZ)\/reserved\/\w+ data-type=text data="{}" status-code=200
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|jsmonitor|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 
 # 开屏广告 //app.bilibili.com
@@ -67,4 +66,4 @@ URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 ^https:\/\/(api\.bilibili\.com\/x\/mengqi\/v1\/resource|app\.bilibili\.com\/x\/resource\/peak\/download) data-type=text data="{}" status-code=200
 
 [MITM]
-hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, ossgw.alicdn.com, vv.video.qq.com, api?.zongheng.com
+hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, vv.video.qq.com, api?.zongheng.com
