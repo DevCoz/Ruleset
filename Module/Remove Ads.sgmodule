@@ -11,6 +11,9 @@ DOMAIN,switch.cup.com.cn,REJECT,extended-matching,pre-matching
 DOMAIN,tysdk.95516.com,REJECT,extended-matching,pre-matching
 
 # 腾讯广告
+[Rule]
+DOMAIN,wximg.wxs.qq.com,REJECT,extended-matching,pre-matching
+DOMAIN,wxsmw.wxs.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN-SUFFIX,wxs.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN,wxsnsdy.wxs.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN,wxsmsdy.video.qq.com,REJECT,extended-matching,pre-matching
@@ -66,4 +69,4 @@ URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 ^https:\/\/(api\.bilibili\.com\/x\/mengqi\/v1\/resource|app\.bilibili\.com\/x\/resource\/peak\/download) data-type=text data="{}" status-code=200
 
 [MITM]
-hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, vv.video.qq.com, api?.zongheng.com
+hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, vv.video.qq.com, api?.zongheng.com, wxa.wxs.qq.com, wximg.wxs.qq.com, wxsmw.wxs.qq.com
