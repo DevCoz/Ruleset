@@ -60,13 +60,12 @@ URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 
 # 腾讯移除推广内容 //mp.weixin.qq.com
 ^https?:\/\/vv\.video\.qq\.com\/(diff|get)vmind data-type=text data="{}" status-code=200
+
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/relatedsearchword data-type=text data="{}" status-code=200
+
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|jsmonitor|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 
-# 开屏广告 //app.bilibili.com
-^http:\/\/[\d\.]+:8000\/v1\/resource\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
-^http:\/\/upos-sz-static\.bilivideo\.com\/ssaxcode\/\w{2}\/\w{2}\/\w{32}-1-SPLASH data-type=text data="{}" status-code=200
-^https:\/\/(api\.bilibili\.com\/x\/mengqi\/v1\/resource|app\.bilibili\.com\/x\/resource\/peak\/download) data-type=text data="{}" status-code=200
+^https:\/\/api2\.zongheng\.com\/api\/giftBag\/bindingBag$ data-type=text data="{}" status-code=200 header="Content-Type:application/json"
 
 [MITM]
 hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, vv.video.qq.com, api?.zongheng.com, wxa.wxs.qq.com, wximg.wxs.qq.com, wxsmw.wxs.qq.com
