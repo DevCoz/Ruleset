@@ -262,7 +262,6 @@ DOMAIN-SUFFIX,domob.cn,REJECT,extended-matching,pre-matching
 DOMAIN-SUFFIX,adwangmai.com,REJECT,extended-matching,pre-matching
 DOMAIN-SUFFIX,bxsnews.com,REJECT,extended-matching,pre-matching
 DOMAIN-SUFFIX,ranfenghd.com,REJECT,extended-matching,pre-matching
-DOMAIN-SUFFIX,mmstat.com,REJECT,extended-matching,pre-matching
 DOMAIN-SUFFIX,miaozhen.com,REJECT,extended-matching,pre-matching
 DOMAIN-SUFFIX,qchannel01.cn,REJECT,extended-matching,pre-matching
 DOMAIN-SUFFIX,ad.xelements.cn,REJECT,extended-matching,pre-matching
