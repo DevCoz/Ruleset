@@ -66,3 +66,5 @@ http-response ^https?://api\.weibo\.cn/2/!/was/finder/searchbarchange$ data='{}'
 http-response ^https?://api\.weibo\.cn/2/search/container_discover\?.*$ data='{}'
 http-response ^https?://api\.weibo\.cn/2/profile/recommend_popusers$ data='{}'
 http-response ^https?://api\.weibo\.cn/2/client/version$ data='{}'
+
+hostname = %APPEND% api.weibo.cn
