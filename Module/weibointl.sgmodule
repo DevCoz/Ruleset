@@ -76,7 +76,6 @@ http-response-jq ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\? \
     .cached_ad.ads |= map(.duration = 0 | .end_date = "1796024904" | .start_date = "1796024914")
   else . end'
 
-[Body Rewrite]
 # 12. sdkapp 开屏广告 - 返回空广告结构 (weibo_sdkad.js 响应格式为 {json}OK，JQ 无法处理，用兜底方案)
 http-response ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$ json {"background_delay_display_time":31536000,"ads":[]}
 
