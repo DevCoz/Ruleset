@@ -7,7 +7,6 @@
 http-response ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$ json {"status":0,"data":{}}
 http-response ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\? json {"result":0,"data":{}}
 
-[JQ Rewrite]
 # 评论区广告过滤（移除 is_ad=true 或 来源为"广告"的评论）
 http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\? \
   '.root.comments |= map(select(.is_ad != true and .source != "广告")) | .root.total_number = (.root.comments | length)'
