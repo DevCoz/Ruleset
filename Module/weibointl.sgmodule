@@ -3,26 +3,54 @@
 #!category=BetaModule
 
 [Body Rewrite]
-# 1. 评论区：移除广告卡片、关键词广告、趋势话题
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments 'del(.ad_list[]?, .trends[]?, .root_comments[]?.keyword_ads[]?)'
+# 开屏广告清空（正则替换空响应）
+http-response ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$ json {"status":0,"data":{}}
+http-response ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\? json {"result":0,"data":{}}
 
-# 2. 信息流/视频流：移除推广微博 (promotion/ad_state)
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(statuses/(unread_hot_timeline|friends/timeline|unread_friends_timeline)|video/tiny_stream_video_list) 'del(.statuses[]? | select(.promotion != null or .ad_state != null)) | del(.advertises[]?)'
+[JQ Rewrite]
+# 评论区广告过滤（移除 is_ad=true 或 来源为"广告"的评论）
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\? \
+  '.root.comments |= map(select(.is_ad != true and .source != "广告")) | .root.total_number = (.root.comments | length)'
 
-# 3. 搜索与发现页：过滤卡片广告
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(searchall|page|cardlist) 'del(.cards[]? | select(.card_type == 9 and .mblog.promotion != null)) | del(.cards[]? | select(.card_type == 122 or .card_type == 118))'
+# 信息流广告（推荐/热门/关注流）— 过滤 mblogtypename="广告"、含 promotion、ad_state=1 的条目
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(statuses/unread_hot_timeline|statuses/friends/timeline|statuses/unread_friends_timeline)\? \
+  '.statuses |= map(select(.mblogtypename != "广告" and .ad_state != 1 and (.promotion // null) == null)) | .total_number = (.statuses | length)'
 
-# 4. 正文页扩展：移除创作者广告共享计划
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend 'del(.trend[]?, .f_ads[]?)'
+# 短视频流广告过滤
+http-response-jq ^https://api\.weibo\.cn/2/video/tiny_stream_video_list\? \
+  '.video_list |= map(select(.is_ad != 1 and .ad_info == null))'
 
-# 5. 开屏广告：直接置空广告数组，设置展示时间为 0
-http-response-jq ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php '.ads = [] | .background_delay = 0 | .show_time = 0'
+# 搜索/超话卡片广告（过滤 card_type 为 ad/promotion 的卡片）
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(searchall|page)\? \
+  '.cards |= map(select(.card_type != "ad" and .card_type != "promotion"))'
 
-# 6. 容器列表（个人主页/发现页详情）：移除广告项
-http-response-jq ^https://api\.weibo\.cn/2/(statuses|search|profile)/container_timeline 'del(.items[]? | select(.data.promotion != null or .data.ad_state != null))'
+# 发现页热点卡片广告
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/cardlist\? \
+  '.cards |= map(select(.card_group == null or (.card_group | map(select(.itemid != null and (.itemid | contains("ad")) | not)) | length) > 0))'
 
-# 7. 搜索 Finder
-http-response-jq ^https://api\.weibo\.cn/2/search/finder 'del(.channel_list[]?.items[]? | select(.data.promotion != null))'
+# 创作者广告共享计划（移除 extend.promotion 字段）
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend\? \
+  'del(.extend.promotion)'
+
+# 容器流（最新微博/发现页）
+http-response-jq ^https://api\.weibo\.cn/2/(statuses|search)/container_timeline\? \
+  '.items |= map(select(.mblogtypename != "广告" and .ad_state != 1))'
+
+# 搜索发现页（finder）
+http-response-jq ^https://api\.weibo\.cn/2/search/finder\? \
+  '.statuses |= map(select(.mblogtypename != "广告"))'
+
+# 博主主页微博流
+http-response-jq ^https://api\.weibo\.cn/2/profile/container_timeline\? \
+  '.items |= map(select(.mblogtypename != "广告" and .ad_state != 1))'
+
+# 视频流反馈广告
+http-response-jq ^https://api\.weibo\.cn/2/video/real_time_feedback\? \
+  'del(.ad_info, .promotion)'
+
+# 视频评论区广告
+http-response-jq ^https://api\.weibo\.cn/2/statuses/container_detail_comment\? \
+  '.root.comments |= map(select(.is_ad != true))'
 
 [MITM]
 hostname = %APPEND% api.weibo.cn, mapi.weibo.com, sdkapp.uve.weibo.com, wbapp.uve.weibo.com
