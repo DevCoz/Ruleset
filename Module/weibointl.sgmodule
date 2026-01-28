@@ -3,39 +3,33 @@
 #!category=BetaModule
 
 [Rule]
-# --- 低开销请求拒绝 (预匹配) ---
+# --- 1. 低开销拒绝 (预匹配) ---
 DOMAIN,bootpreload.uve.weibo.com,REJECT
 DOMAIN,wbapp.uve.weibo.com,REJECT
 DOMAIN,sdkapp.uve.weibo.com,REJECT
 DOMAIN,bootrealtime.uve.weibo.com,REJECT
 DOMAIN-SUFFIX,biz.weibo.com,REJECT
 
-# --- 拒绝特定字典路径 ---
-URL-REGEX,^https:\/\/api\.weibo\.cn\/2\/(guest\/cardlist|checkin\/show|cardlist\?|!\/sug\/list\/finderchangemode|live\/media_homelist|!\/was\/finder\/searchbarchange|search\/container_discover\?|profile\/recommend_popusers|client\/version),REJECT-DICT
+# --- 3. 原生 JQ 响应重写 ---
 
-# --- JQ 核心净化逻辑 ---
+# 评论区过滤 (对应 container_detail_comment)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/container_detail_comment 'def str: (. // "") | tostring; def is_jd: (type == "object") and ([.content_auth_info?.content_auth_title?, .content_auth_info_dark?.content_auth_title?, .data?.content_auth_info?.content_auth_title?, .data?.content_auth_info_dark?.content_auth_title?] | map(str) | any(. == "荐读")); def is_ad: (type == "object") and ((.mblogtypename? | str) == "广告" or .ad_object? != null or .is_ad_card? == 1 or .ad_marked? == true or (.actionlog?.source? | str) == "ad" or is_jd); if .items then .items |= map(select(is_ad | not)) else . end'
 
-# 1. 评论区/详情页 (含荐读、广告过滤)
-^https:\/\/api\.weibo\.cn\/2\/statuses\/container_detail_comment http-response-jq 'def str: (. // "") | tostring; def is_jd: (type == "object") and ([.content_auth_info?.content_auth_title?, .content_auth_info_dark?.content_auth_title?, .data?.content_auth_info?.content_auth_title?, .data?.content_auth_info_dark?.content_auth_title?, .data?.content_auth_title?, .data?.blog?.content_auth_info?.content_auth_title?, .data?.blog?.content_auth_info_dark?.content_auth_title?, .data?.blog?.content_auth_title?] | map(str) | any(. == "荐读")); def has_ad_source: (type == "object") and ((.actionlog?.source? | str) == "ad" or (.data?.actionlog?.source? | str) == "ad" or (.data?.blog?.actionlog?.source? | str) == "ad" or (if (.data?.blog?.buttons | type) == "array" then (.data.blog.buttons | map(.actionlog?.source? | str) | any(. == "ad")) else false end)); def is_comment_header_filter: (type == "object") and ((.type? | str) == "comment_header_filter" or (.data?.type? | str) == "comment_header_filter"); def is_ad: (type == "object") and ((.mblogtypename? | str) == "广告" or (.data?.mblogtypename? | str) == "广告" or (.data?.blog?.mblogtypename? | str) == "广告" or .ad_object? != null or .data?.ad_object? != null or .adid? != null or .data?.adid? != null or .is_ad_card? == 1 or .is_ad_card? == true or .data?.is_ad_card? == 1 or .data?.is_ad_card? == true or .ad_marked? == true or .data?.ad_marked? == true or has_ad_source or is_jd); if (.items | type) == "array" then .items |= map(select((is_ad | not) and (is_comment_header_filter | not))) else . end'
+# 正文详情页 (处理关注推荐与搜热搜)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/container_detail$ 'def str:(.//"")|tostring; def is_remove: (type=="object") and ((.data?.card_type//0)==4 or (.data?.card_type//0)==86 or (.itemid?=="top_searching") or (.hint?=="大家都在搜") or (.mblogtypename?=="广告")); if (.data|type)=="array" then .data |= map(select(is_remove|not)) elif (.data.items|type)=="array" then .data.items |= map(select(is_remove|not)) else . end'
 
-# 2. 正文详情页 (含关注推荐、大家都在搜)
-^https:\/\/api\.weibo\.cn\/2\/statuses\/container_detail$ http-response-jq 'def str:(.//"")|tostring; def is_ad: (type=="object") and (.is_ad_card?==1 or .is_ad_card?==true or .data?.is_ad_card?==1 or .data?.is_ad_card?==true or .ad_marked?==true or .data?.ad_marked?==true or .promotion?!=null or .data?.promotion?!=null or (.actionlog?.source?|str)=="ad" or (.data?.actionlog?.source?|str)=="ad" or (.source?|str)=="ad" or (.data?.source?|str)=="ad" or (.mblogtypename?|str)=="广告" or (.data?.mblogtypename?|str)=="广告"); def is_follow_reco: (type=="object") and ((.data|type)=="object") and ((.data.card_type//0)==4 or (.data.card_type//0)==86); def is_top_search: (type=="object") and (((.itemid|str)=="top_searching") or ((.hint|str)=="大家都在搜") or ((.data?.itemid|str)=="top_searching") or ((.data?.hint|str)=="大家都在搜")); def is_remove: (is_follow_reco or is_top_search or is_ad); def drop: if (type=="array") then map(select((type!="object") or (is_remove|not))) else . end; (if (.pageHeader.data.items|type)=="array" then .pageHeader.data.items |= drop else . end) | (if (.data|type)=="array" then .data |= drop elif (.data.items|type)=="array" then .data.items |= drop elif (.data.data|type)=="array" then .data.data |= drop else . end)'
+# 搜索流过滤
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/(search\/container_timeline|searchall) 'def is_bad: (type == "object") and ((.mblogtypename? == "广告") or (.source? == "ad") or (.ad_marked? == true)); if .items then .items |= map(select(is_bad | not)) elif .data?.items then .data.items |= map(select(is_bad | not)) else . end'
 
-# 3. 搜索流 (搜索页广告过滤)
-^https:\/\/api\.weibo\.cn\/2\/search\/container_timeline http-response-jq 'def str: (. // "") | tostring; def is_bad: (type == "object") and ((.mblogtypename? | str) == "广告" or (.data?.mblogtypename? | str) == "广告" or (.source? | str) == "ad" or (.data?.source? | str) == "ad" or (.is_ad_card? | ( . == 1 or . == true)) or (.ad_marked? == true) or .promotion? != null); def filter_list: if (type == "array") then map(select((is_bad) | not)) else . end; if (.items? | type) == "array" then .items |= filter_list else . end | if (.data?.items? | type) == "array" then .data.items |= filter_list else . end | if (.data?.cards? | type) == "array" then .data.cards |= filter_list else . end'
+# 个人中心净化
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/profile\/me 'if .items then .items |= map(select(.itemId == "profileme_mine" or .itemId == "100505_-_top8" or .itemId == "100505_-_profilevisitor") | if .itemId == "profileme_mine" then del(.header.vipView, .header.vipIcon) else . end) else . end'
 
-# 4. 个人页 (Profile 侧边栏及多余项清理)
-^https:\/\/api\.weibo\.cn\/2\/profile\/me http-response-jq 'def str: (. // "") | tostring; def is_keep: (type == "object") and ((.itemId? | str) | ( . == "profileme_mine" or . == "100505_-_top8" or . == "100505_-_profilevisitor")); if (.items | type) == "array" then .items |= map(select(is_keep) | if (.itemId == "profileme_mine") then del(.header.vipView, .header.vipIcon) elif (.itemId == "100505_-_top8") then .items |= map(select((.itemId?|str) | (. == "100505_-_album" or . == "100505_-_like" or . == "100505_-_watchhistory" or . == "100505_-_draft"))) elif (.itemId == "100505_-_profilevisitor") then del(.footer) else . end) else . end'
+# 发现页/热点频道净化
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/search\/finder 'def is_ad: (type == "object") and ((.itemid? == "finder_window") or (.mblogtypename? == "广告") or (.ad_marked? == true)); if .channelInfo?.channels then .channelInfo.channels |= map(select(.key == "discover_channel" or .title == "热点")) else . end'
 
-# 5. 红包与侧边栏清理
-^https:\/\/api\.weibo\.cn\/2\/push\/active http-response-jq 'def rdel($k): if type == "object" then (to_entries | map(select(.key != $k) | .value |= rdel($k)) | from_entries) elif type == "array" then map(rdel($k)) else . end; rdel("ug_red_paper")'
-^https:\/\/api\.weibo\.cn\/2\/statuses\/extend http-response-jq 'del(.top_cards)'
-
-# 6. 搜索发现与频道 (Finder)
-^https:\/\/api\.weibo\.cn\/2\/search\/finder http-response-jq 'def str: (. // "") | tostring; def is_ad: (type == "object") and (((.itemid? | str) == "finder_window") or ((.mblogtypename? | str) == "广告") or (.ad_marked? == true) or (.promotion? != null) or (.scheme? | str | contains("openadscheme"))); def clean: if type == "array" then map(clean) | map(select(is_ad | not)) elif type == "object" then with_entries(.value |= clean) | with_entries(select(.value | is_ad | not)) else . end; clean | (if (.channelInfo?.channels | type) == "array" then .channelInfo.channels |= map(select((.key | str) == "discover_channel" or (.title | str) == "热点")) else . end)'
-
-# 7. 评论构建逻辑
-^https:\/\/api\.weibo\.cn\/2\/comments\/build_comments http-response-jq 'if (.datas? | type) == "array" then .datas |= map(if (.adType? | type) == "string" and (.adType | contains("荐读")) then del(.adType) else . end) else . end'
+# 杂项清理 (红包与侧边栏)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/push\/active 'del(.. | .ug_red_paper?)'
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/extend 'del(.top_cards)'
 
 [MITM]
 hostname = %APPEND% api.weibo.cn, *.uve.weibo.com, biz.weibo.com
