@@ -2,7 +2,7 @@
 #!desc = Weibo JQ Ad-Block。
 #!category=BetaModule
 
-[JQ Rewrite]
+[Body Rewrite]
 # 1. 评论区广告（常见字段：is_ad / source）
 # ⚠️ 验证点：检查广告评论是否含 .is_ad=1 或 .source="广告"
 http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\? \
@@ -32,7 +32,6 @@ http-response-jq ^https://api\.weibo\.cn/2/((statuses|search)/container_timeline
 http-response-jq ^https://api\.weibo\.cn/2/(video/real_time_feedback|statuses/container_detail_comment)\? \
   'del(.ad_info, .promotion, .ad_data)'
 
-[Body Rewrite]
 # 开屏广告（安全兜底：返回最小合法 JSON）
 http-response ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$ json {"status":0}
 http-response ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\? json {"result":0}
