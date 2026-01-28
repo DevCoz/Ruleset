@@ -2,38 +2,40 @@
 #!desc = Weibo JQ Ad-Block。
 #!category=BetaModule
 
+[JQ Rewrite]
+# 1. 评论区广告（常见字段：is_ad / source）
+# ⚠️ 验证点：检查广告评论是否含 .is_ad=1 或 .source="广告"
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\? \
+  'if has("root") and (.root | has("comments")) then .root.comments |= map(select(.is_ad != true and ((.source // "") | contains("广告") | not))) | .root.total_number = (.root.comments | length) else . end'
+
+# 2. 信息流广告（常见字段：mblogtypename="广告" / ad_state=1）
+# ⚠️ 验证点：检查广告微博 .mblogtypename 值及是否存在 .promotion 字段
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(statuses/(unread_hot_timeline|friends/timeline|unread_friends_timeline)|video/tiny_stream_video_list)\? \
+  'if has("statuses") then .statuses |= map(select(.mblogtypename != "广告" and .ad_state != 1 and (.promotion // null) == null)) | if has("total_number") then .total_number = (.statuses | length) else . end else . end'
+
+# 3. 卡片类广告（搜索/超话/热点，常见字段：card_type="ad" / itemid 含 "ad"）
+# ⚠️ 验证点：检查广告卡片 .card_type 值及 .itemid 是否含 "ad"
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(searchall|page|cardlist)\? \
+  'if has("cards") then .cards |= map(select((.card_type // "") != "ad" and (.card_type // "") != "promotion" and ((.itemid // "") | contains("ad") | not))) else . end'
+
+# 4. 创作者广告共享计划（移除 .extend.promotion）
+# ⚠️ 验证点：检查正常响应是否含 .extend.promotion
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend\? \
+  'if has("extend") and (.extend | has("promotion")) then del(.extend.promotion) else . end'
+
+# 5. 容器流（博主主页/发现页，常见字段：mblogtypename="广告"）
+# ⚠️ 验证点：确认广告条目在 .items 还是 .statuses 数组
+http-response-jq ^https://api\.weibo\.cn/2/((statuses|search)/container_timeline|profile/container_timeline|search/finder)\? \
+  'if has("items") then .items |= map(select(.mblogtypename != "广告" and .ad_state != 1)) else if has("statuses") then .statuses |= map(select(.mblogtypename != "广告")) else . end'
+
+# 6. 视频流广告（移除 ad_info/promotion）
+http-response-jq ^https://api\.weibo\.cn/2/(video/real_time_feedback|statuses/container_detail_comment)\? \
+  'del(.ad_info, .promotion, .ad_data)'
+
 [Body Rewrite]
-# 1. 评论区：去除广告元素、推荐趋势、评论内嵌广告
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\? 'del(.ad_list[]?, .trends[]?, .root_comments[]?.keyword_ads[]?)'
-
-# 2. 核心信息流：去除推荐流、关注流、视频流中的推广微博 (promotion/ad_state)
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(statuses/(unread_hot|friends|unread_friends)_timeline|video/tiny_stream_video_list)\? 'del(.statuses[]? | select(.promotion != null or .ad_state != null)) | del(.advertises[]?, .ad[]?)'
-
-# 3. 发现页与搜索卡片：去除特定的广告卡片类型 (card_type 9且带推广, 118, 122等)
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(searchall|page|cardlist)\? 'del(.cards[]? | select(.card_type == 9 and .mblog.promotion != null)) | del(.cards[]? | select(.card_type == 118 or .card_type == 122 or .card_type == 182)) | del(.cards[]? | select(.mblog.ad_state != null))'
-
-# 4. 发现页热点 (特殊处理)
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/cardlist\? 'del(.cards[]? | select(.card_type == 9 and .mblog.promotion != null))'
-
-# 5. 微博正文扩展：去除“创作者广告共享计划”、趋势等底部杂项
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend\? 'del(.trend[]?, .f_ads[]?, .cm_ad[]?, .ad_state)'
-
-# 6. 开屏广告：清空广告数组，强制展示时间为0
-http-response-jq ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$ '.ads = [] | .background_delay = 0 | .show_time = 0'
-http-response-jq ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\? '.ad_list = [] | .is_cached = false'
-
-# 7. 容器列表 (搜索/详情页)：去除推广项
-http-response-jq ^https://api\.weibo\.cn/2/(statuses|search)/container_timeline\? 'del(.items[]? | select(.data.promotion != null or .data.ad_state != null))'
-
-# 8. 搜索引导页 (Finder)
-http-response-jq ^https://api\.weibo\.cn/2/search/finder\? 'del(.channel_list[]?.items[]? | select(.data.promotion != null))'
-
-# 9. 个人主页时间轴
-http-response-jq ^https://api\.weibo\.cn/2/profile/container_timeline\? 'del(.items[]? | select(.data.promotion != null))'
-
-# 10. 视频流反馈与评论广告
-http-response-jq ^https://api\.weibo\.cn/2/video/real_time_feedback\? 'del(.ad_list[]?)'
-http-response-jq ^https://api\.weibo\.cn/2/statuses/container_detail_comment\? 'del(.ad_list[]?, .comment_ad[]?)'
+# 开屏广告（安全兜底：返回最小合法 JSON）
+http-response ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$ json {"status":0}
+http-response ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\? json {"result":0}
 
 [MITM]
 hostname = %APPEND% api.weibo.cn, mapi.weibo.com, sdkapp.uve.weibo.com, wbapp.uve.weibo.com
