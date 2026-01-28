@@ -1,6 +1,6 @@
 #!name = 微博净化
 #!desc = 微博净化模块 (原生 JQ 版)。
-#!author = gemini。
+#!category=BetaModule
 
 [Rule]
 # --- 低开销请求拒绝 (预匹配) ---
