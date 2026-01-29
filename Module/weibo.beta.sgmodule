@@ -4,36 +4,36 @@
 
 [Body Rewrite]
 #1.微博下面的评论
-http-response-jq^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\?'.datas|=map(select(.type!=1))'
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\?'.datas|=map(select(.type!=1))'
 
 #2.微博推荐/热门/榜单/视频流/全部关注
-http-response-jq^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(statuses/unread_hot_timeline|statuses/friends/timeline|video/tiny_stream_video_list|statuses/unread_friends_timeline)\?'.statuses|=map(select(((.promotion//null)==null)and((.promotion_info//null)==null)))|.advertises=[]|.ad=[]|.trends=[]'
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(statuses/unread_hot_timeline|statuses/friends/timeline|video/tiny_stream_video_list|statuses/unread_friends_timeline)\?'.statuses|=map(select(((.promotion//null)==null)and((.promotion_info//null)==null)))|.advertises=[]|.ad=[]|.trends=[]'
 
 #3.发现搜索/超话
-http-response-jq^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(searchall|page)\?'.cards|=map(select((.card_type!=9)or(.mblog.promotion.type!="ad")))|.items|=map(select(.data.is_ad!=1))'
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(searchall|page)\?'.cards|=map(select((.card_type!=9)or(.mblog.promotion.type!="ad")))|.items|=map(select(.data.is_ad!=1))'
 
 #4.发现热点(包含复杂嵌套卡片处理)
-http-response-jq^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/cardlist\?'.cards|=map(if.card_type==9and.mblog.promotion.type=="ad"thenemptyelse(if.card_type==11then.card_group|=map(if.card_type==118then.items|=(map(select((.card_type!=119)or((.sub_item//[]|.[0].promotion)==null)))|to_entries|map(.keyas$i|.value|if.card_type==119then.itemid="window_\($i)"else.end))else.end)else.end)end)'
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/cardlist\?'.cards|=map(if.card_type==9and.mblog.promotion.type=="ad"thenemptyelse(if.card_type==11then.card_group|=map(if.card_type==118then.items|=(map(select((.card_type!=119)or((.sub_item//[]|.[0].promotion)==null)))|to_entries|map(.keyas$i|.value|if.card_type==119then.itemid="window_\($i)"else.end))else.end)else.end)end)'
 
 #5.每条微博下面创作者广告共享计划/贴片广告
-http-response-jq^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend\?'del(.trend)|.head_cards|=map(select(((.actionlog.source//"")!="ad")and((.action_button.actionlog.source//"")!="ad")and((.card_type//0)!=236or(.is_ad_card//0)!=1)))'
+http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend\?'del(.trend)|.head_cards|=map(select(((.actionlog.source//"")!="ad")and((.action_button.actionlog.source//"")!="ad")and((.card_type//0)!=236or(.is_ad_card//0)!=1)))'
 
 #6.开屏广告(SDK接口)
 #注意:由于原接口返回格式为{json}OK，需先修正为标准JSON才能被JQ解析。
 http-response^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$body-replace(?s)\}OK$\}
-http-response-jq^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$'.background_delay_display_time=31536000|.ads[]|=(.displaytime=0|.begintime="2040-12-2700:00:01"|.endtime="2040-12-2723:59:59")'
+http-response-jq ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$'.background_delay_display_time=31536000|.ads[]|=(.displaytime=0|.begintime="2040-12-2700:00:01"|.endtime="2040-12-2723:59:59")'
 
 #7.开屏广告(Lua接口)
-http-response-jq^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\?'.cached_ad.ads[]|=(.duration=0|.end_date="1796024904"|.start_date="1796024914")'
+http-response-jq ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\?'.cached_ad.ads[]|=(.duration=0|.end_date="1796024904"|.start_date="1796024914")'
 
 #8.微博最新微博/发现
-http-response-jq^https://api\.weibo\.cn/2/(statuses|search)/container_timeline\?'.items|=map(select(((.data.mblogtype//0)!=1)and((.status.promotion//null)==null)and((.status.promotion_info//null)==null)))'
+http-response-jq ^https://api\.weibo\.cn/2/(statuses|search)/container_timeline\?'.items|=map(select(((.data.mblogtype//0)!=1)and((.status.promotion//null)==null)and((.status.promotion_info//null)==null)))'
 
 #9.发现初始化接口
-http-response-jq^https://api\.weibo\.cn/2/search/finder\?'.channelInfo.channels[0].payload.items|=map(select((.data.promotion.type//"")!="ad"))'
+http-response-jq ^https://api\.weibo\.cn/2/search/finder\?'.channelInfo.channels[0].payload.items|=map(select((.data.promotion.type//"")!="ad"))'
 
 #10.微博博主详情页
-http-response-jq^https://api\.weibo\.cn/2/profile/container_timeline\?'.items|=map(select((.data==null)or(.data.promotion.type!="ad")))'
+http-response-jq ^https://api\.weibo\.cn/2/profile/container_timeline\?'.items|=map(select((.data==null)or(.data.promotion.type!="ad")))'
 
 [MITM]
 hostname= %APPEND% api.weibo.cn,mapi.weibo.com,sdkapp.uve.weibo.com,wbapp.uve.weibo.com
