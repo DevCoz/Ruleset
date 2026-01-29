@@ -12,7 +12,6 @@ DOMAIN,tysdk.95516.com,REJECT,extended-matching,pre-matching
 
 # 腾讯广告
 [Rule]
-
 DOMAIN,wxsmsdy.video.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN,info4.video.qq.com,REJECT,extended-matching,pre-matching
 DOMAIN,info6.video.qq.com,REJECT,extended-matching,pre-matching
@@ -35,9 +34,6 @@ URL-REGEX,^https://goblin\.hupu\.com/[^/]+/[^/]+/interfaceAd/,REJECT
 DOMAIN,business.msstatic.com,REJECT
 DOMAIN-SUFFIX,v1d.szbdyd.com,REJECT
 
-# 纵横小说开屏广告
-URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
-
 [Map Local]
 # 开屏广告  //api.douban.com
 ^https:\/\/api\.douban\.com\/v\d\/app_ads\/splash data-type=text data="{}" status-code=200
@@ -49,12 +45,7 @@ URL-REGEX,^https:\/\/api1\.zongheng\.com\/iosapi\/system\/startup$,REJECT
 
 # 腾讯移除推广内容 //mp.weixin.qq.com
 ^https?:\/\/vv\.video\.qq\.com\/(diff|get)vmind data-type=text data="{}" status-code=200
-
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/relatedsearchword data-type=text data="{}" status-code=200
-
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|jsmonitor|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
-
-^https:\/\/api2\.zongheng\.com\/api\/giftBag\/bindingBag$ data-type=text data="{}" status-code=200 header="Content-Type:application/json"
-
 [MITM]
-hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, vv.video.qq.com, api?.zongheng.com, wxa.wxs.qq.com, wximg.wxs.qq.com, wxsmw.wxs.qq.com
+hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, vv.video.qq.com, wxa.wxs.qq.com, wximg.wxs.qq.com, wxsmw.wxs.qq.com
