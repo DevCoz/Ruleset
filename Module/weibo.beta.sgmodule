@@ -20,7 +20,7 @@ http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend\?'
 
 #6.开屏广告(SDK接口)
 #注意:由于原接口返回格式为{json}OK，需先修正为标准JSON才能被JQ解析。
-http-response^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$body-replace(?s)\}OK$\}
+http-response ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$body-replace(?s)\}OK$\}
 http-response-jq ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$'.background_delay_display_time=31536000|.ads[]|=(.displaytime=0|.begintime="2040-12-2700:00:01"|.endtime="2040-12-2723:59:59")'
 
 #7.开屏广告(Lua接口)
