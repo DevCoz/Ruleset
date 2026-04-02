@@ -12,6 +12,11 @@ DOMAIN,tysdk.95516.com,REJECT,extended-matching,pre-matching
 
 # 腾讯广告
 [Rule]
+DOMAIN,ad.tencentvideo.com,REJECT
+DOMAIN,adstats.tencentvideo.com,REJECT
+DOMAIN,info6.video.qq.com,REJECT
+DOMAIN-SUFFIX,gdtimg.com,REJECT
+DOMAIN-SUFFIX,ugdtimg.com,REJECT
 DOMAIN,v2mi.gdt.qq.com,REJECT,extended-matching,pre-matching
 
 # 快看漫画
