@@ -38,4 +38,4 @@ DOMAIN-SUFFIX,v1d.szbdyd.com,REJECT
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/relatedsearchword data-type=text data="{}" status-code=200
 ^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|jsmonitor|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 [MITM]
-hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com, vv.video.qq.com, wxa.wxs.qq.com, wximg.wxs.qq.com, wxsmw.wxs.qq.com
+hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com
