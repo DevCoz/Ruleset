@@ -38,9 +38,5 @@ DOMAIN-SUFFIX,v1d.szbdyd.com,REJECT
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/home_banner data-type=text data="{}" status-code=200
 ^https:\/\/frodo\.douban\.com\/api\/v\d\/search\/found_words data-type=text data="{}" status-code=200
 
-# 腾讯移除推广内容 //mp.weixin.qq.com
-^https?:\/\/vv\.video\.qq\.com\/(diff|get)vmind data-type=text data="{}" status-code=200
-^https:\/\/mp\.weixin\.qq\.com\/mp\/relatedsearchword data-type=text data="{}" status-code=200
-^https:\/\/mp\.weixin\.qq\.com\/mp\/(cps_product_info|getappmsgad|jsmonitor|masonryfeed|relatedarticle)\? data-type=text data="{}" status-code=200
 [MITM]
-hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, mp.weixin.qq.com, goblin.hupu.com
+hostname = %APPEND% api.douban.com, m.douban.com, api.kkmh.com, goblin.hupu.com
