@@ -1,39 +1,115 @@
-#!name=Weibo
-#!desc=移除微博开屏、信息流、评论区及搜索页广告。
+#!name=微博去广告
+#!desc=过滤微博广告及去除各部分推广模块（JQ Body Rewrite 版）
 #!category=BetaModule
 
+[Rule]
+DOMAIN-SUFFIX,uve.weibo.com,DIRECT,extended-matching
+DOMAIN,huodong.weibo.cn,REJECT,extended-matching,pre-matching
+DOMAIN-SUFFIX,biz.weibo.com,REJECT,extended-matching,pre-matching
+
+[Map Local]
+^https:\/\/api\.weibo\.cn\/2\/(?:ug\/checkin\/list|push\/daily|push\/info) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/!\/live\/media_homelist\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/comments\/bullet_screens\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/photo\/info\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/statuses\/(?:container_positive|push_info) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/vote\/get_vote_detail\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/!\/chaohua\/discovery\/home_bottom\/switch\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/!\/huati\/(?:discovery_home_bottom_getdotinfo|mobile_discovery_searchchange) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/!\/wbox\/\w+\/(?:home_bottom_modal|interest_category) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/search\/(?:container_discover|finder_nav_polling)\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/hot\/hours_spotlight\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/video\/redpacket\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/!\/(?:search\/finder_nav_polling|sug\/list\/finderchange|was\/finder\/searchbarchange)\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/api\.weibo\.cn\/2\/video\/tiny_video_info_show\? data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/bootrealtime\.uve\.weibo\.com\/v[23]\/ad\/realtime data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/sdkapp\.uve\.weibo\.com\/interface\/sdk\/(?:get-lbs-cell-info\.php|sdkconfig\.php) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/card\.weibo\.com\/article\/m\/aj\/(?:reward|uvead) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+^https:\/\/weibo\.com\/ttarticle\/x\/m\/aj\/(?:reward|uvead) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
 [Body Rewrite]
-#1.微博下面的评论
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/comments/build_comments\?'.datas|=map(select(.type!=1))'
+# ────────────────────────────────────────────────
+# 通用广告过滤宏（cards 数组 + card_group 子项）
+# 广告判定依据：card_type∈{9,11} | 存在 promotion | 存在 ad_info | mblog.ad_state≠0
+# ────────────────────────────────────────────────
 
-#2.微博推荐/热门/榜单/视频流/全部关注
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(statuses/unread_hot_timeline|statuses/friends/timeline|video/tiny_stream_video_list|statuses/unread_friends_timeline)\?'.statuses|=map(select(((.promotion//null)==null)and((.promotion_info//null)==null)))|.advertises=[]|.ad=[]|.trends=[]'
+# 移除首页推广 (checkin/show · client/publisher_list · push/active)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/(?:checkin\/show|client\/publisher_list|push\/active) '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null))) else . end)'
 
-#3.发现搜索/超话
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/(searchall|page)\?'.cards|=map(select((.card_type!=9)or(.mblog.promotion.type!="ad")))|.items|=map(select(.data.is_ad!=1))'
+# 移除首页顶部标签（过滤推广 tab）
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/groups\/allgroups\/v2\? '.data.groups? |= map(select((.type? != "ad") and (.promotion == null)))'
 
-#4.发现热点(包含复杂嵌套卡片处理)
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/cardlist\?'.cards|=map(if.card_type==9and.mblog.promotion.type=="ad"thenemptyelse(if.card_type==11then.card_group|=map(if.card_type==118then.items|=(map(select((.card_type!=119)or((.sub_item//[]|.[0].promotion)==null)))|to_entries|map(.keyas$i|.value|if.card_type==119then.itemid="window_\($i)"else.end))else.end)else.end)end)'
+# 移除信息流广告 (cardlist · page)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/(?:cardlist|page) '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null) and (.mblog.ad_state == null or .mblog.ad_state == 0))) else . end)'
 
-#5.每条微博下面创作者广告共享计划/贴片广告
-http-response-jq ^https://(api\.weibo\.cn|mapi\.weibo\.com)/2/statuses/extend\?'del(.trend)|.head_cards|=map(select(((.actionlog.source//"")!="ad")and((.action_button.actionlog.source//"")!="ad")and((.card_type//0)!=236or(.is_ad_card//0)!=1)))'
+# 移除评论区广告
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/comments\/build_comments\? '.data.data? |= map(select((.object_type? != "ad") and (.ad_info == null)))'
 
-#6.开屏广告(SDK接口)
-#注意:由于原接口返回格式为{json}OK，需先修正为标准JSON才能被JQ解析。
-http-response ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$body-replace(?s)\}OK$\}
-http-response-jq ^https://sdkapp\.uve\.weibo\.com/interface/sdk/sdkad\.php$'.background_delay_display_time=31536000|.ads[]|=(.displaytime=0|.begintime="2040-12-2700:00:01"|.endtime="2040-12-2723:59:59")'
+# 移除个人微博详情页广告 (container/asyn · flowlist · flowpage)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/(?:container\/asyn|flowlist|flowpage) '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null))) else . end)'
 
-#7.开屏广告(Lua接口)
-http-response-jq ^https://wbapp\.uve\.weibo\.com/wbapplua/wbpullad\.lua\?'.cached_ad.ads[]|=(.duration=0|.end_date="1796024904"|.start_date="1796024914")'
+# 移除关注、取消关注后的推广弹窗
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/friendships\/(?:create|destroy) 'del(.data.followCard?) | del(.data.revFollowCard?)'
 
-#8.微博最新微博/发现
-http-response-jq ^https://api\.weibo\.cn/2/(statuses|search)/container_timeline\?'.items|=map(select(((.data.mblogtype//0)!=1)and((.status.promotion//null)==null)and((.status.promotion_info//null)==null)))'
+# 移除个人主页广告 (container_timeline · dealatt · me · statuses/tab · userinfo)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/profile\/(?:container_timeline|dealatt|me|statuses\/tab|userinfo) '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null))) else . end)'
 
-#9.发现初始化接口
-http-response-jq ^https://api\.weibo\.cn/2/search/finder\?'.channelInfo.channels[0].payload.items|=map(select((.data.promotion.type//"")!="ad"))'
+# 移除超话搜索页广告
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/shproxy\/chaohua\/discovery\/searchactive\? '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)))'
 
-#10.微博博主详情页
-http-response-jq ^https://api\.weibo\.cn/2/profile/container_timeline\?'.items|=map(select((.data==null)or(.data.promotion.type!="ad")))'
+# 移除 statuses 系列信息流广告
+# (container_detail · container_detail_comment · container_timeline 系列 · repost_timeline · unread_hot_timeline)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/(?:container_detail(?:_comment)?|container_timeline(?:_hot|_topic|_topicpage|_unread)?|repost_timeline|unread_hot_timeline) '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null) and (.mblog.ad_state == null or .mblog.ad_state == 0))) else . end)'
+
+# 移除微博详情页内嵌推广 (statuses/extend · statuses/show)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/(?:extend|show)\? 'del(.data.status.promotion?) | del(.data.status.ad_info?) | del(.data.status.mblog?.promotion?)'
+
+# 移除视频流广告 (full_screen_stream · tiny_stream_mid_detail · tiny_stream_video_list)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/video\/(?:full_screen_stream|tiny_stream_mid_detail|tiny_stream_video_list)\? '.data.data? |= map(select((.ad_info == null) and (.object?.ad_state == null or .object?.ad_state == 0)))'
+
+# 移除超话顶部标签中的推广频道
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/!\/huati\/discovery_home_bottom_channels\? '.data.channels? |= map(select((.type? != "ad") and (.promotion == null)))'
+
+# 移除消息页列表广告
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/direct_messages\/user_list\? '.data.direct_message_list? |= map(select(.ad_info == null))'
+
+# 移除消息页广告提醒
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/messageflow\/notice\? '.data.notice? |= if type == "array" then map(select((.notice_type? | IN("ad","ad_notice")) | not)) else . end'
+
+# 移除热门/搜索信息流广告 (search/container_timeline · search/finder)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/search\/(?:container_timeline|finder)\? '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null))) else . end)'
+
+# 移除发现页搜索结果广告 (searchall)
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/searchall\? '.data.cards? |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group |= map(select(.card_type != 9 and .card_type != 11 and (.promotion == null) and (.ad_info == null))) else . end)'
+
+# 移除开屏广告 — bootpreload (v1/v2)
+http-response-jq ^https:\/\/bootpreload\.uve\.weibo\.com\/v[12]\/ad\/preload '{}'
+
+# 移除开屏广告 — sdkad.php
+http-response-jq ^https:\/\/sdkapp\.uve\.weibo\.com\/interface\/sdk\/sdkad\.php '{}'
+
+# 移除开屏广告 — wbapplua / preload/get_ad
+http-response-jq ^https:\/\/wbapp\.uve\.weibo\.com\/(?:preload\/get_ad|wbapplua\/wbpullad\.lua) '{}'
+
+[MITM]
+hostname = %APPEND% *.weibo.cn, *.weibo.com, weibo.com
 
 [MITM]
 hostname= %APPEND% api.weibo.cn,mapi.weibo.com,sdkapp.uve.weibo.com,wbapp.uve.weibo.com
