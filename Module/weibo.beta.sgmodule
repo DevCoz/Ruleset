@@ -84,9 +84,9 @@ http-response-jq ^https:\/\/api\.weibo\.cn\/2\/shproxy\/chaohua\/discovery\/sear
 # items[].status 结构
 http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/container_timeline\b '.items = [.items[] | select(.status == null or ((.status.is_ad == null or .status.is_ad == 0) and (.status.ad_state == null or .status.ad_state == 0) and .status.promotion == null and .status.ad_object == null))] | del(.moreInfo.params.lastAdInterval) | del(.refreshInfo.params.preAdInterval)'
 
-# 移除 container_timeline_hot 热门信息流广告
+# 移除 container_timeline_hot / container_timeline_unread 信息流广告
 # items[].data 结构
-http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/container_timeline_hot\b '.items = [.items[] | select(.data == null or ((.data.is_ad == null or .data.is_ad == 0) and (.data.ad_state == null or .data.ad_state == 0) and .data.promotion == null and .data.ad_object == null))] | del(.moreInfo.params.lastAdInterval) | del(.refreshInfo.params.preAdInterval)'
+http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/container_timeline_(?:hot|unread)\b '.items = [.items[] | select(.data == null or ((.data.is_ad == null or .data.is_ad == 0) and (.data.ad_state == null or .data.ad_state == 0) and .data.promotion == null and .data.ad_object == null))] | del(.moreInfo.params.lastAdInterval) | del(.refreshInfo.params.preAdInterval)'
 
 # 移除 statuses 系列信息流广告（通用 cards 结构，兼容旧版）
 http-response-jq ^https:\/\/api\.weibo\.cn\/2\/statuses\/(?:container_detail(?:_comment)?|repost_timeline|unread_hot_timeline) '.data.cards |= [.[] | select((.card_type != 9) and (.card_type != 11) and (.promotion == null) and (.ad_info == null)) | if .card_group then .card_group = [.card_group[] | select((.card_type != 9) and (.card_type != 11) and (.promotion == null) and (.ad_info == null) and ((.mblog.ad_state == null) or (.mblog.ad_state == 0)))] else . end]'
