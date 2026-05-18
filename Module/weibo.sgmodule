@@ -1,0 +1,166 @@
+#!name=微博去广告
+#!desc=去除微博广告、推广、挂件、弹窗（JQ Body Rewrite 版，基于 HAR 实测数据）
+#!category=BetaModule
+
+
+[Rule]
+# 上传日志 / 数据收集
+DOMAIN,datacollection.uve.weibo.com,REJECT
+DOMAIN,adpinpai.video.weibocdn.com,REJECT
+DOMAIN-SUFFIX,dp.im.weibo.cn,REJECT
+
+# 开屏广告域名
+DOMAIN,bootpreload.uve.weibo.com,REJECT
+DOMAIN-SUFFIX,wbapp.uve.weibo.com,REJECT
+DOMAIN-SUFFIX,sdkapp.uve.weibo.com,REJECT
+DOMAIN-SUFFIX,fastimage.uve.weibo.com,REJECT
+DOMAIN-SUFFIX,click.uve.weibo.com,REJECT
+
+# 信息流 / 投放广告
+DOMAIN-SUFFIX,biz.weibo.com,REJECT
+DOMAIN-SUFFIX,biz.weibo.com.cn,REJECT
+DOMAIN-SUFFIX,adimg.uve.weibo.com,REJECT
+DOMAIN-SUFFIX,adimg.vue.weibo.com,REJECT
+DOMAIN-SUFFIX,ad.weibo.com,REJECT
+DOMAIN-SUFFIX,alitui.weibo.com,REJECT
+DOMAIN-SUFFIX,alitui.weibo.com.cn,REJECT
+DOMAIN-SUFFIX,tui.weibo.com,REJECT
+DOMAIN-SUFFIX,promote.biz.weibo.cn,REJECT
+DOMAIN-SUFFIX,wax.weibo.com,REJECT
+DOMAIN-SUFFIX,wax.weibo.com.cn,REJECT
+DOMAIN-SUFFIX,zymo.mps.weibo.com,REJECT
+DOMAIN-SUFFIX,weibomingzi.com,REJECT
+DOMAIN-SUFFIX,dsp.edm.weibo.cn,REJECT
+
+# 游戏 / widget / 推送
+DOMAIN-SUFFIX,game.weibo.cn,REJECT
+DOMAIN-SUFFIX,game.weibo.com,REJECT
+DOMAIN-SUFFIX,widget.weibo.com,REJECT
+DOMAIN-SUFFIX,gw5.push.mcp.weibo.cn,REJECT
+DOMAIN-SUFFIX,gw6.push.mcp.weibo.cn,REJECT
+
+# Viber 广告
+DOMAIN-SUFFIX,ads.viber.com,REJECT
+DOMAIN-SUFFIX,ads-d.viber.com,REJECT
+DOMAIN-SUFFIX,ads.aws.viber.com,REJECT
+
+[Map Local]
+# ── 开屏广告 ──────────────────────────────────
+^https?:\/\/bootrealtime\.uve\.weibo\.com\/v\d\/ad\/realtime data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/bootpreload\.uve\.weibo\.com\/v\d\/ad\/preload data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+# sdkad.php 末尾有非标准 "OK"，由 Script 处理，Map Local 仅拦 sdkconfig
+^https?:\/\/sdkapp\.uve\.weibo\.com\/interface\/sdk\/(get-lbs-cell-info\.php|sdkconfig\.php) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+# ── 推送 / 日报 / 日志 ────────────────────────
+^https?:\/\/m?api\.weibo\.c(n|om)\/2\/push\/(daily|info)\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/m?api\.weibo\.c(n|om)\/2\/logservice\/service\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/api-cloudim\.api\.weibo\.com\/v1\/log\/ data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+# ── 超话 / wbox 弹窗 ──────────────────────────
+^https?:\/\/m?api\.weibo\.c(n|om)\/2\/!\/chaohua\/discovery\/home_bottom\/switch data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/m?api\.weibo\.c(n|om)\/2\/!\/huati\/(discovery_home_bottom_getdotinfo|mobile_discovery_searchchange)\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/m?api\.weibo\.c(n|om)\/2\/!\/was\/finder\/searchbarchange\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+# ── 其他杂项屏蔽 ──────────────────────────────
+^https?:\/\/bootrealtime\.uve\.weibo\.com\/v[23]\/ad\/realtime data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/card\.weibo\.com\/article\/m\/aj\/(reward|uvead)\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/weibo\.com\/ttarticle\/x\/m\/aj\/(reward|uvead)\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+# ── 轻享版 (weibointl) ────────────────────────
+^https?:\/\/weibointl\.api\.weibo\.(cn|com)\/portal\.php\?a=hot_search_users data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/weibointl\.api\.weibo\.cn\/portal\.php\?a=get_searching_info data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/weibointl\.api\.weibo\.(cn|com)\/portal\.php\?a=treehole&auth= data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?:\/\/m?api\.weibo\.(cn|com)\/\d\/(cardlist\?v_f=\d|ad\/weibointl\?) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+[Body Rewrite]
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 轻享版 banner 广告
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+http-response-jq ^https?:\/\/weibointl\.api\.weibo\.cn\/portal\.php\?a=trends& del(.data.banner?)
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 评论区广告（新版）
+# HAR 实测：type="trend" 即为广告/荐读，commentAdType 字段也标记广告
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_detail_comment[?] if .items then .items |= map(select(.type? != "trend" and .commentAdType? == null)) else . end
+
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_detail_mix[?] if .items then .items |= map(select(.type? != "trend" and .commentAdType? == null)) else . end
+
+# 旧版评论区 datas[].adType
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/comments\/mix_comments[?] if .datas then .datas |= map(select(.adType? != "广告")) else . end
+
+# 转发区：只保留 type=forward
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_detail_forward[?] if .items then .items |= map(select(.type? == "forward")) else . end
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ① container_timeline 广告 JQ 补充
+# weibo_main.js 只检 item.data，HAR 实测广告在 item.status（category=dynamic）
+# 两者串联：Script 先跑，JQ 再补漏
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_timeline[?] if .items then .items |= map(. as $i | ($i.status? // $i.data? // {}) as $b | if (($b.mblogtypename? // "") | IN("广告","热推")) or ($b.readtimetype? == "adMblog") or (($b.promotion.type? // "") | . != "" and test("^ad")) or ($b.is_ad? == 1) then empty else $i end) else . end
+
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_timeline_unread[?] if .items then .items |= map(. as $i | ($i.status? // $i.data? // {}) as $b | if (($b.mblogtypename? // "") | IN("广告","热推")) or ($b.readtimetype? == "adMblog") or (($b.promotion.type? // "") | . != "" and test("^ad")) or ($b.is_ad? == 1) then empty else $i end) else . end
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ② container_timeline_hot 全量 JQ 处理
+# weibo_main.js otherUrls 未覆盖此接口（key 带 "?" 导致 indexOf 不匹配 "_hot?"）
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_timeline_hot[?] del(.ad?,.advertises?,.trends?) | if .items then .items |= map(. as $i | ($i.status? // $i.data? // {}) as $b | if (($b.mblogtypename? // "") | IN("广告","热推")) or ($b.readtimetype? == "adMblog") or (($b.promotion.type? // "") | . != "" and test("^ad")) or ($b.is_ad? == 1) then empty else $i end) else . end
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 搜索页 cardlist group 过滤（Loon plugin 原有规则）
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+http-response-jq ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/cardlist[?] if .items then .items |= map(select(.category? != "group")) else . end
+
+[Script]
+# ── 发现页 / 搜索 ────────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/search\/(finder|container_timeline|container_discover)\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博发现页去广告
+
+# ── 热搜页 / flowpage ────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/(page|flowpage)\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博热搜页去广告
+
+# ── 话题搜索页 ───────────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/searchall\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博话题页去广告
+
+# ── 超话 topicpage ────────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_timeline_topicpage\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博超话页去广告
+
+# ── 超话 topic tab ────────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_timeline_topic\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博超话tab去广告
+
+# ── 微博详情 extend / container_detail ───────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/extend\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博详情页去广告
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_detail\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博详情页去广告
+
+# ── 顶部 Tab 分组 ─────────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/groups\/allgroups\/v2 requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博顶部Tab过滤
+
+# ── 评论区（weibo_ads.js 处理 trend 广告 / commentAdType）────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/comments\/mix_comments\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博评论区去广告
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/(container_detail_comment|container_detail_mix)\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博评论区去广告
+
+# ── 转发区（weibo_ads.js 过滤非 forward 类 item）────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/container_detail_forward\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_ads.js,tag=微博转发区去广告
+
+# ── 转发列表 ─────────────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/repost_timeline\? requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js,tag=微博转发列表去广告
+
+# ── 信息流 / 个人页 / 视频 / 评论 / 签到 ──────
+# 注意：container_timeline 和 container_timeline_unread 被 weibo_main.js 处理，
+#       但广告在 item.status 会漏掉 → Body Rewrite JQ 已在上方补充
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/(cardlist|searchall|page|messageflow|statuses\/(unread_)?friends(\/|_)timeline|groups\/timeline|statuses\/(container_timeline|container_timeline_hot|container_timeline_unread|extend|video_mixtimeline)|profile\/(me|container_timeline)|video\/(community_tab|remind_info|tiny_stream_video_list)|checkin\/show|(\!\/)?live\/media_homelist|comments\/build_comments|container\/get_item) requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js,tag=微博信息流去广告
+
+# ── 开屏广告（sdkad.php 末尾含非标准 "OK"，必须 Script 处理）──
+http-response ^https?:\/\/(sdk|wb)app\.uve\.weibo\.com(\/interface\/sdk\/sdkad\.php|\/wbapplua\/wbpullad\.lua) requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_launch.js,tag=微博开屏去广告
+
+# ── 自定义 tab 皮肤 ────────────────────────────
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/!\/client\/light_skin requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js,tag=微博自定义tab皮肤
+
+# ── 非会员皮肤预览 ─────────────────────────────
+http-response ^https?:\/\/new\.vip\.weibo\.c(n|om)\/littleskin\/preview requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js,tag=微博非会员皮肤预览
+
+# ── 解锁会员图标（可选，默认启用）─────────────
+http-response ^https?:\/\/new\.vip\.weibo\.c(n|om)\/aj\/appicon\/list requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_vip.js,tag=微博会员图标解锁
+
+[MITM]
+hostname = %APPEND% *.weibo.cn, *.weibo.com, weibo.com, *.uve.weibo.com
