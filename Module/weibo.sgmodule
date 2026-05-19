@@ -2,7 +2,6 @@
 #!desc=去除微博广告、推广、挂件、弹窗（JQ Body Rewrite 版，基于 HAR 实测数据）
 #!category=BetaModule
 
-
 [Rule]
 # 上传日志 / 数据收集
 DOMAIN,datacollection.uve.weibo.com,REJECT
@@ -10,9 +9,6 @@ DOMAIN,adpinpai.video.weibocdn.com,REJECT
 DOMAIN-SUFFIX,dp.im.weibo.cn,REJECT
 
 # 开屏广告域名
-DOMAIN,bootpreload.uve.weibo.com,REJECT
-DOMAIN-SUFFIX,wbapp.uve.weibo.com,REJECT
-DOMAIN-SUFFIX,sdkapp.uve.weibo.com,REJECT
 DOMAIN-SUFFIX,fastimage.uve.weibo.com,REJECT
 DOMAIN-SUFFIX,click.uve.weibo.com,REJECT
 
@@ -62,7 +58,6 @@ DOMAIN-SUFFIX,ads.aws.viber.com,REJECT
 ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/!\/was\/finder\/searchbarchange\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
 
 # ── 其他杂项屏蔽 ──────────────────────────────
-^https?:\/\/bootrealtime\.uve\.weibo\.com\/v[23]\/ad\/realtime data-type=text data="{}" status-code=200 header="Content-Type:application/json"
 ^https?:\/\/card\.weibo\.com\/article\/m\/aj\/(reward|uvead)\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
 ^https?:\/\/weibo\.com\/ttarticle\/x\/m\/aj\/(reward|uvead)\b data-type=text data="{}" status-code=200 header="Content-Type:application/json"
 
@@ -148,7 +143,7 @@ http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/statuses\/repost_timeline\? 
 # ── 信息流 / 个人页 / 视频 / 评论 / 签到 ──────
 # 注意：container_timeline 和 container_timeline_unread 被 weibo_main.js 处理，
 #       但广告在 item.status 会漏掉 → Body Rewrite JQ 已在上方补充
-http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/(cardlist|searchall|page|messageflow|statuses\/(unread_)?friends(\/|_)timeline|groups\/timeline|statuses\/(container_timeline|container_timeline_hot|container_timeline_unread|extend|video_mixtimeline)|profile\/(me|container_timeline)|video\/(community_tab|remind_info|tiny_stream_video_list)|checkin\/show|(\!\/)?live\/media_homelist|comments\/build_comments|container\/get_item) requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js,tag=微博信息流去广告
+http-response ^https?:\/\/m?api\.weibo\.c(n|om)\/2\/(cardlist|messageflow|statuses\/(unread_)?friends(\/|_)timeline|groups\/timeline|statuses\/(container_timeline|container_timeline_unread|video_mixtimeline)|profile\/(me|container_timeline)|video\/(community_tab|remind_info|tiny_stream_video_list)|checkin\/show|(\!\/)?live\/media_homelist|comments\/build_comments|container\/get_item) requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_main.js,tag=微博信息流去广告
 
 # ── 开屏广告（sdkad.php 末尾含非标准 "OK"，必须 Script 处理）──
 http-response ^https?:\/\/(sdk|wb)app\.uve\.weibo\.com(\/interface\/sdk\/sdkad\.php|\/wbapplua\/wbpullad\.lua) requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/zmqcherish/proxy-script/main/weibo_launch.js,tag=微博开屏去广告
@@ -163,4 +158,4 @@ http-response ^https?:\/\/new\.vip\.weibo\.c(n|om)\/littleskin\/preview requires
 http-response ^https?:\/\/new\.vip\.weibo\.c(n|om)\/aj\/appicon\/list requires-body=true,timeout=60,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/weibo/weibo_vip.js,tag=微博会员图标解锁
 
 [MITM]
-hostname = %APPEND% *.weibo.cn, *.weibo.com, weibo.com, *.uve.weibo.com
+hostname = %APPEND% *.weibo.cn, *.weibo.com, weibo.com
