@@ -2,16 +2,6 @@
 #!desc=去除微博客户端信息流、评论区、开屏及各类推广广告。
 #!category=BetaModule
 
-//[Map Local]
-^https?://(biz|bootpreload|fastimage|adimg|sdkapp|promote|game|ads|alitui|dp\.im|widget|dsp\.edm|tui|ad|datacollection|adpinpai)\.weibo\.(com|cn)/.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-^https?://api\.weibo\.cn/2/(push/active|client/addlog_batch|ad/preload).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-^https?://(sdkapp\.uve\.weibo\.com/interface/sdk/|card\.weibo\.com/article/m/aj/(reward|uvead)).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-^https?://api-cloudim\.api\.weibo\.com/v1/log/.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-^https?://m?api\.weibo\.c(n|om)/\d/(cardlist\?v_f=\d|ad/weibointl\?).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-^https?://m?api\.weibo\.c(n|om)/\d/push/daily.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-^https?://boot(realtime|preload)\.uve\.weibo\.com/v\d/ad/(realtime|preload).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-
-
 [Script]
 # 1. 响应体净化 (核心去广告逻辑)
 # 匹配微博核心 API，交由 JS 脚本进行 JSON 节点剔除。
