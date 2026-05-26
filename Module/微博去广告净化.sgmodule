@@ -22,5 +22,4 @@
 微博请求重写 = type=http-request, pattern=^https?:\/\/api\.weibo\.cn\/2\/(remind\/unread_count|statuses\/user_timeline), script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/WeiboRequest.js, requires-body=0
 
 [MITM]
-# 必须开启 HTTPS 解密。使用 %APPEND% 避免覆盖您配置文件中已有的 hostname。
 hostname = %APPEND% api.weibo.cn, m.weibo.cn, weibo.com, uve.weibo.com, api-cloudim.api.weibo.com, card.weibo.com, weibocdn.com, weibomingzi.com, new.vip.weibo.cn, biz.weibo.com, sdkapp.uve.weibo.com
