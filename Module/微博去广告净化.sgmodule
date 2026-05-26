@@ -1,7 +1,6 @@
 #!name=微博去广告净化
 #!desc=去除微博客户端信息流、评论区、开屏及各类推广广告。
 #!category=BetaModule
-#!system=ios
 
 [Map Local]
 ^https?://(biz|bootpreload|fastimage|adimg|sdkapp|promote|game|ads|alitui|dp\.im|widget|dsp\.edm|tui|ad|datacollection|adpinpai)\.weibo\.(com|cn)/.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
