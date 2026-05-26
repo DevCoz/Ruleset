@@ -2,7 +2,7 @@
 #!desc=去除微博客户端信息流、评论区、开屏及各类推广广告。
 #!category=BetaModule
 
-[Map Local]
+//[Map Local]
 ^https?://(biz|bootpreload|fastimage|adimg|sdkapp|promote|game|ads|alitui|dp\.im|widget|dsp\.edm|tui|ad|datacollection|adpinpai)\.weibo\.(com|cn)/.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
 ^https?://api\.weibo\.cn/2/(push/active|client/addlog_batch|ad/preload).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
 ^https?://(sdkapp\.uve\.weibo\.com/interface/sdk/|card\.weibo\.com/article/m/aj/(reward|uvead)).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
