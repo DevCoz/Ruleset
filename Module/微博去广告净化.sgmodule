@@ -1,0 +1,23 @@
+#!name=微博去广告净化 (Surge 深度适配版)
+#!desc=去除微博客户端信息流、评论区、开屏及各类推广广告。需配合本地 JS 脚本使用。
+#!system=ios
+
+[Script]
+# 1. 响应体净化 (核心去广告逻辑)
+# 匹配微博核心 API，交由 JS 脚本进行 JSON 节点剔除。
+# 注意：max-size=0 表示不限制响应体大小，防止微博长列表 JSON 被截断导致解析失败。
+微博响应净化 = type=http-response, pattern=^https?:\/\/(api\.weibo\.cn|m\.weibo\.cn|weibo\.com|new\.vip\.weibo\.cn|api-cloudim\.api\.weibo\.com)\/, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/WeiboResponse.js, timeout=60
+
+# 2. 请求拦截 (利用 Surge 原生 reject-dict 直接返回空 JSON {})
+# 完美替代原脚本中的 Anywhere.respond({body: "{}"})，性能更高。
+微博广告域名拦截 = type=http-request, pattern=^https?:\/\/(biz|bootpreload|fastimage|adimg|sdkapp|promote|game|ads|alitui|dp\.im|widget|dsp\.edm|tui|ad|datacollection|adpinpai)\.weibo\.(com|cn), reject-dict=true
+微博追踪API拦截 = type=http-request, pattern=^https?:\/\/api\.weibo\.cn\/2\/(push\/active|client\/addlog_batch|ad\/preload), reject-dict=true
+微博开屏与推广拦截 = type=http-request, pattern=^https?:\/\/(sdkapp\.uve\.weibo\.com\/interface\/sdk\/|card\.weibo\.com\/article\/m\/aj\/(reward|uvead)), reject-dict=true
+
+# 3. 请求重写 (时间线接口替换与 UID 缓存)
+# 微博个人主页时间线需要特定的 containerid，此脚本用于拦截并重写 URL。
+微博请求重写 = type=http-request, pattern=^https?:\/\/api\.weibo\.cn\/2\/(remind\/unread_count|statuses\/user_timeline), script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/WeiboRequest.js, requires-body=0
+
+[MITM]
+# 必须开启 HTTPS 解密。使用 %APPEND% 避免覆盖您配置文件中已有的 hostname。
+hostname = %APPEND% api.weibo.cn, m.weibo.cn, weibo.com, uve.weibo.com, api-cloudim.api.weibo.com, card.weibo.com, weibocdn.com, weibomingzi.com, new.vip.weibo.cn, biz.weibo.com, sdkapp.uve.weibo.com
