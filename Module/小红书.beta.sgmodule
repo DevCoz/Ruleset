@@ -34,7 +34,7 @@ http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/system
 [Script]
 # 🎯 6. 核心响应体净化脚本 (仅保留 JQ 无法完成的复杂逻辑)
 # 涵盖: Feed流解锁保存、LivePhoto提取、视频直链替换、评论区净化、首页/关注流过滤
-小红书JS净化 = type=http-response, pattern=^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/(?:v\d+/search/notes|v\d+/(?:followfeed|homefeed)|(?:v2/note/feed|v3/note/videofeed|v4/note/videofeed|v10/note/video/save)|v\d+/note/(?:imagefeed|live_photo/save)|v5/note/comment/list|v3/note/comment/sub_comments|v1/interaction/comment/video/download), requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/XHS_Response_JQ.js, timeout=60
+小红书JS净化 = type=http-response, pattern=^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/(?:v\d+/search/notes|v\d+/(?:followfeed|homefeed)|(?:v2/note/feed|v3/note/videofeed|v4/note/videofeed|v10/note/video/save)|v\d+/note/(?:imagefeed|live_photo/save)|v5/note/comment/list|v3/note/comment/sub_comments|v1/interaction/comment/video/download), requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/XHS_Response_JQ.js
 
 [MITM]
 hostname = %APPEND% edith.xiaohongshu.com, www.xiaohongshu.com, ci.xiaohongshu.com, rec.xiaohongshu.com, so.xiaohongshu.com
