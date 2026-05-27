@@ -3,33 +3,32 @@
 #!category=BetaModule
 
 [Map Local]
-# 🎯 1. 拦截营销/盲盒/引导接口 (返回空 JSON)
+# 拦截营销/盲盒/引导接口 (返回空 JSON)
 ^https?://edith\.xiaohongshu\.com/api/sns/v1/surprisebox/(?:get_style|open|submit_action).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
 ^https?://www\.xiaohongshu\.com/api/marketing/box/trigger\?.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
 ^https?://edith\.xiaohongshu\.com/api/sns/v\d+/note/(?:guide|detailfeed/preload)\?.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
 ^https?://edith\.xiaohongshu\.com/api/sns/v\d+/guide/user_banner.* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
 ^https?://www\.xiaohongshu\.com/api/sns/(?:v\d+/ads/resource|v\d+/hey/\w+/hey_gallery).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
-
-# 🎯 2. 拦截水印配置接口 (返回 1x1 透明 GIF)
+# 拦截水印配置接口 (返回 1x1 透明 GIF)
 ^https?://ci\.xiaohongshu\.com/system_config/watermark.* data="R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-type=base64 status-code=200 header="Content-Type:image/gif"
 
 [URL Rewrite]
-# 🎯 3. 防缓存与解压处理 (确保 Body Rewrite/Script 能拿到最新明文 JSON)
+# 防缓存与解压处理
 ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/ header-delete If-None-Match
 ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/ header-delete If-Modified-Since
 ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/ header-replace "Accept-Encoding" "identity"
 
 [Body Rewrite]
-# 🎯 4. 搜索/系统配置/组件净化 (纯 JQ 处理，零 JS 开销)
-# 语法：http-response <URL正则> jq "<JQ表达式>"
-http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/banner_list jq ".data = {}"
-http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/hot_list jq ".data.items = []"
-http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/hint jq ".data.hint_words = []"
-http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/trending jq ".data.queries = [] | .data.hint_word = {}"
-http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/system_service/config jq "del(.data.app_theme, .data.loading_img, .data.splash, .data.store)"
-http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/note/widgets jq "del(.data.cooperate_binds, .data.generic, .data.note_next_step, .data.widget_list)"
+# 🎯 核心：使用官方 http-response-jq 语法进行 JSON 结构化清洗
+http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/banner_list '.data = {}'
+http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/hot_list '.data.items = []'
+http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/hint '.data.hint_words = []'
+http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/trending '.data.queries = [] | .data.hint_word = {}'
+http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/system_service/config 'del(.data.app_theme, .data.loading_img, .data.splash, .data.store)'
+http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/note/widgets 'del(.data.cooperate_binds, .data.generic, .data.note_next_step, .data.widget_list)'
+http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/system_service/splash_config '(.data.ads_groups[]?.start_time, .data.ads_groups[]?.end_time, .data.ads_groups[]?.ads[]?.start_time, .data.ads_groups[]?.ads[]?.end_time) = 3818332800'
 
-# 🎯 5. 开屏广告时间篡改 (纯 JQ 处理)
+# 🎯 开屏广告时间篡改 (纯 JQ 处理)
 http-response ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/system_service/splash_config jq "(.data.ads_groups[]?.start_time, .data.ads_groups[]?.end_time, .data.ads_groups[]?.ads[]?.start_time, .data.ads_groups[]?.ads[]?.end_time) = 3818332800"
 
 [Script]
