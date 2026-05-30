@@ -18,9 +18,7 @@ try {
     let data = JSON.parse(body);
     cleanWeibo(data, url, 0);
     body = JSON.stringify(data);
-} catch (e) {
-    console.log("微博净化解析失败: " + e.message);
-}
+} catch (e) {}
 
 $.done({ body });
 
@@ -74,9 +72,8 @@ function cleanWeibo(o, url, depth) {
     });
 }
 
-// --- Surge Env 适配类 ---
+// --- Surge Env 适配类（已移除调试日志）---
 function Env(name) {
     this.name = name;
-    this.log = (...args) => console.log(`[${name}]`, ...args);
     this.done = (val) => $done(val);
 }
