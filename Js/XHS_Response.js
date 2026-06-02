@@ -1,14 +1,17 @@
-// XHS_Response_JQ.js - 仅保留 JQ 无法处理的复杂逻辑
+// XHS_Response.js - 小红书核心响应体净化脚本 (Surge 适配版)
 let url = $request.url;
 let body = $response.body;
-if (!body) { $done({}); } else {
+
+if (!body) {
+    $done({});
+} else {
     let obj;
-    try { obj = JSON.parse(body); } catch (_) { $done({}); }
+    try { obj = JSON.parse(body); } catch (_) { $done({}); return; }
 
     // === 持久化存储辅助 ===
     const FEED_KEY = "fmz200.xiaohongshu.feed.rsp";
     const COMMENTS_KEY = "fmz200.xiaohongshu.comments.rsp";
-    function getStore(key, fb) { try { return JSON.parse($persistentStore.read(key)) || fb; } catch(_) { return fb; } }
+    function getStore(key, fb) { try { const r = $persistentStore.read(key); return r ? JSON.parse(r) : fb; } catch(_) { return fb; } }
     function setStore(key, val) { $persistentStore.write(JSON.stringify(val), key); }
 
     // === 解锁保存/下载权限 ===
@@ -77,7 +80,7 @@ if (!body) { $done({}); } else {
     }
 
     // --- 视频 Feed: 提取最高清直链并缓存 ---
-    if (url.includes("/v3/note/videofeed?") || url.includes("/v4/note/videofeed")) {
+    if (url.includes("/v3/note/videofeed") || url.includes("/v4/note/videofeed")) {
         const videoData = [];
         for (const item of obj.data || []) {
             enableSave(item);
@@ -97,7 +100,7 @@ if (!body) { $done({}); } else {
     }
 
     // --- 评论区: 收集评论 Live Photo ---
-    if (url.includes("/api/sns/v5/note/comment/list?") || url.includes("/api/sns/v3/note/comment/sub_comments?")) {
+    if (url.includes("/api/sns/v5/note/comment/list") || url.includes("/api/sns/v3/note/comment/sub_comments")) {
         const comments = obj.data?.comments || [];
         const noteId = comments[0]?.note_id || "";
         const livePhotos = [];
@@ -124,14 +127,14 @@ if (!body) { $done({}); } else {
     }
 
     // --- 评论视频下载: 替换直链 ---
-    if (url.includes("/api/sns/v1/interaction/comment/video/download?")) {
+    if (url.includes("/api/sns/v1/interaction/comment/video/download")) {
         const cached = getStore(COMMENTS_KEY, null);
         const m = cached?.livePhotos?.find(i => i.videId === obj.data?.video?.video_id);
         if (m?.videoUrl) obj.data.video.video_url = m.videoUrl;
     }
 
     // --- 搜索结果: 只保留笔记类型 ---
-    if (url.includes("/search/notes?") && Array.isArray(obj.data?.items)) {
+    if (url.includes("/search/notes") && Array.isArray(obj.data?.items)) {
         obj.data.items = obj.data.items.filter(i => i?.model_type === "note");
     }
 
