@@ -11,7 +11,8 @@
 
 [URL Rewrite]
 # 🎯 3. 防缓存与解压处理 (确保 Body Rewrite/Script 拿到最新明文 JSON)
-^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-replace "Accept-Encoding" "identity"
+^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-delete If-None-Match
+^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-delete If-Modified-Since
 
 [Body Rewrite]
 # 🎯 4. 全局字段清洗 (利用 Surge 原生 JQ 引擎，零 JS 开销)
