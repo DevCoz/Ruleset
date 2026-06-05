@@ -9,10 +9,10 @@
 # 🎯 2. 社区广场流拦截 (Mock 返回特定结构 JSON，防止 App 报错)
 ^https?://[^/]+/community/square/v\d/stream.* data="{\"data\":{\"cards\":[{\"content\":{},\"type\":\"RECOMMENDS\"}]},\"ret\":0}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
 
-[URL Rewrite]
+[Header Rewrite]
 # 🎯 3. 防缓存与解压处理 (确保 Body Rewrite/Script 拿到最新明文 JSON)
-^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-delete If-None-Match
-^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-delete If-Modified-Since
+http-request ^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-del If-None-Match
+http-request ^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-del If-Modified-Since
 
 [Body Rewrite]
 # 🎯 4. 全局字段清洗 (利用 Surge 原生 JQ 引擎，零 JS 开销)
