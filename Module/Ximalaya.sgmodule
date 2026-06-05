@@ -1,0 +1,27 @@
+#!name=喜马拉雅去广告
+#!desc=使用 Map Local 拦截，Body Rewrite JQ 清洗固定字段，JS 处理复杂数组过滤。
+#!category=BetaModule
+
+[Map Local]
+# 🎯 1. 拦截各类广告/推荐/活动/签到接口 (Mock 返回空 JSON)
+^https?://[^/]+/(?:hub/(?:guideWord|hotWord)V\d/|discovery-feed/v\d/scene/listen/refresh|x-web-activity/signIn/getHomePageSignInInfo/|subscribe/v\d/subscribe/tagAlbumList|track-feed/v\d/chase/recommend/|social-web/follow-stream/category/\d+|mobile-playpage/playpage/recommendContentV\d/|mobile-playpage/playpage/recommend/resource/allocation/|firework-portal/v\d+/sync|business-sale-promotion-guide-mobile-web/popup/|app-skin-service/skin/setting/info/|lamia/v1/subscribe/status|subscribe/v\d/subscribe/recommend|mobile-user/v\d/purchased/recommend/).* data="{}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
+
+# 🎯 2. 社区广场流拦截 (Mock 返回特定结构 JSON，防止 App 报错)
+^https?://[^/]+/community/square/v\d/stream.* data="{\"data\":{\"cards\":[{\"content\":{},\"type\":\"RECOMMENDS\"}]},\"ret\":0}" data-type=text status-code=200 header="Content-Type:application/json; charset=utf-8"
+
+[URL Rewrite]
+# 🎯 3. 防缓存与解压处理 (确保 Body Rewrite/Script 拿到最新明文 JSON)
+^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|football-portal/diff2/batch|nexus-web/v\d/tabs/customTabs|mobile-playpage/playpage/tabs/v2/|mobile-user/v\d/homePage/) header-replace "Accept-Encoding" "identity"
+
+[Body Rewrite]
+# 🎯 4. 全局字段清洗 (利用 Surge 原生 JQ 引擎，零 JS 开销)
+http-response-jq ^https?://[^/]+/football-portal/diff2/batch.* 'del(.json.ad, .json.toc)'
+http-response-jq ^https?://[^/]+/mobile-playpage/playpage/tabs/v2/.* 'del(.data.playpage.resourceMap.defaultResource, .data.playpage.resourceMap.playPageTip)'
+http-response-jq ^https?://[^/]+/mobile-user/v\d/homePage/.* 'del(.data.freeListenV2)'
+
+[Script]
+# 🎯 5. 核心响应体净化脚本 (处理复杂的数组过滤与条件判断)
+喜马拉雅JS净化 = type=http-response, pattern=^https?://[^/]+/(?:discovery-feed/v\d/mix/|discovery-category/customCategories/|nexus-web/v\d/tabs/customTabs|mobile-user/v\d/homePage/), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/Ximalaya.js
+
+[MITM]
+hostname = %APPEND% gslbali.ximalaya.com, search.ximalaya.com, searchwsa.ximalaya.com, mobile.ximalaya.com, mobilehera.ximalaya.com, mobwsa.ximalaya.com, m.ximalaya.com, mwsa.ximalaya.com, live.ximalaya.com, livewsa.ximalaya.com
