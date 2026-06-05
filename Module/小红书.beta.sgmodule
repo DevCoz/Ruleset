@@ -14,6 +14,11 @@
 # 🎯 2. 拦截水印配置接口 (Mock 返回 1x1 透明 GIF)
 ^https?://ci\.xiaohongshu\.com/system_config/watermark.* data="R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-type=base64 status-code=200 header="Content-Type:image/gif"
 
+[Header Rewrite]
+# 🎯 3. 防 304 缓存处理 (必须使用独立的 [Header Rewrite] 段落！)
+http-request ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/ header-del If-None-Match
+http-request ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/ header-del If-Modified-Since
+
 [Body Rewrite]
 # 🎯 4. 搜索/系统配置/组件净化 (纯 JQ 处理，零 JS 开销)
 http-response-jq ^https?://(edith|www|rec|so)\.xiaohongshu\.com/api/sns/v\d+/search/banner_list '.data = {}'
