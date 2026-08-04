@@ -21,13 +21,6 @@ DOMAIN,v2mi.gdt.qq.com,REJECT,extended-matching,pre-matching
 # 快看漫画
 URL-REGEX,^https?://api\.kkmh\.com/.+(ad|advertisement)/,REJECT
 
-# 虎扑
-URL-REGEX,^https://goblin\.hupu\.com/[^/]+/[^/]+/interfaceAd/,REJECT
-
-# 虎牙直播
-DOMAIN,business.msstatic.com,REJECT
-DOMAIN-SUFFIX,v1d.szbdyd.com,REJECT
-
 # 喜马拉雅
 DOMAIN,adsehera.ximalaya.com,REJECT
 DOMAIN,adse.wsa.ximalaya.com,REJECT
