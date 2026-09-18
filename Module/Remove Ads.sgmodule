@@ -16,7 +16,10 @@ DOMAIN,adstats.tencentvideo.com,REJECT
 DOMAIN,info6.video.qq.com,REJECT
 DOMAIN-SUFFIX,gdtimg.com,REJECT
 DOMAIN-SUFFIX,ugdtimg.com,REJECT
-DOMAIN,v2mi.gdt.qq.com,REJECT,extended-matching,pre-matching
+DOMAIN,ads.privacy.qq.com,REJECT
+DOMAIN,adsadmin.e.qq.com,REJECT
+DOMAIN,sdkquic.e.qq.com,REJECT
+DOMAIN,gdt.qq.com,REJECT,extended-matching,pre-matching
 
 # 快看漫画
 URL-REGEX,^https?://api\.kkmh\.com/.+(ad|advertisement)/,REJECT
