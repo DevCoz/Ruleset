@@ -1,5 +1,5 @@
 /**
- * weibo-noads.js
+ * weibo-noads.js  v1.1
  * Surge http-response 脚本：清理微博 App 接口响应中的广告 / 推广条目
  *
  * 设计原则
@@ -7,6 +7,15 @@
  *   2. 同时兼容两代接口结构：老的 statuses / cards，新的 items / feed；
  *   3. 对 16 位以上整数（微博 id）做精度保护，避免 JSON.parse 改写 id；
  *   4. 任何异常都原样放行 —— 脚本出错绝不能导致 App 断网或白屏。
+ *
+ * v1.1 新增（对照 DevCoz/Ruleset 模块后补的判定，均已用差分用例验证）
+ *   + itemid 中的广告位编码（c_type:51 / is_ad_pos / region_data ...）
+ *   + mblogtypename / adType 取值「广告」「热推」
+ *   + content_auth_info.content_auth_title 含「广告」
+ *   + category=group + trend_name 的超话 / 视频推荐卡
+ *   + 幸存条目上的品牌橱窗挂件（semantic_brand_params / shopwindow_cards）
+ *   同时刻意**不采用**对方「对每个节点都 delete trend」的写法：
+ *   实测会把话题页 / 超话页的业务数据一起删掉（见 test/compare-thirdparty.js）。
  *
  * 调试：在模块的脚本行里把 argument=debug=0 改成 argument=debug=1，
  *       Surge 的「脚本日志」会输出命中的 URL、删除数量与耗时。
@@ -154,7 +163,11 @@ function inList(list, route) {
 function handleTimeline(obj) {
     var removed = purge(obj, 0);
 
-    if (isArray(obj.statuses)) removed += dropAdItems(obj.statuses);
+    if (isArray(obj.statuses)) {
+        removed += dropAdItems(obj.statuses);
+        // 幸存条目上挂的品牌橱窗 / 语义推广位，单独摘掉
+        for (var i = 0; i < obj.statuses.length; i++) removed += stripAdWidgets(obj.statuses[i]);
+    }
     if (isArray(obj.ad)) { removed += obj.ad.length; obj.ad = []; }
     if (isArray(obj.advertises)) { removed += obj.advertises.length; obj.advertises = []; }
     if (isArray(obj.trends)) removed += dropAdItems(obj.trends);
@@ -266,17 +279,84 @@ function handleEmptyStories(obj) { obj.story_list = []; return 0; }
 /* ------------------------------------------------------------------ */
 
 /**
- * 判定一个节点是否广告。字段依据微博接口实测与模型层符号：
- *   is_ad / ad_state / mblogtype=1 / promotion.type="ad" / ad_id+ad_type
+ * itemid 是微博给每个信息流条目分配的编码串，广告位会在里面留下固定标记。
+ * 这里只匹配已知的广告片段，不做「含 ad 就算广告」这种模糊判断，
+ * 否则 ad_mark / download 这类正常词都会被误伤。
+ */
+var AD_ITEMID = /c_type:51|is_ad_pos|region_data|infeed_may_interest_in|infeed_friends_recommend/;
+
+/* 超话 / 视频的推荐卡：字段是 category=group + trend_name，不是 mblogtype */
+var AD_TREND_NAMES = {
+    super_topic_recommend_card: 1,
+    recommend_video_card: 1
+};
+
+/**
+ * 判定一个节点是否广告。字段依据接口实测、模型层符号，以及第三方模块
+ * （DevCoz/Ruleset）中经过验证的部分；每条都要求「精确取值」而非「字段存在」。
  */
 function isAd(o) {
     if (!o || typeof o !== 'object') return false;
+
+    /* ① 微博自己的广告标记 */
     if (o.is_ad === true || o.is_ad === 1 || o.is_ad === '1') return true;
+    if (o.isAd === true) return true;
     if (o.ad_state === true || o.ad_state === 1) return true;
     if (o.mblogtype === 1 || o.mblogtype === '1') return true;
+
+    /* ② 文案标记：只认「广告 / 热推」这两个确切值，「热门」不能删 */
+    var mt = o.mblogtypename;
+    if (mt === '\u5e7f\u544a' || mt === '\u70ed\u63a8') return true;
+    if (o.adType === '\u5e7f\u544a' || o.ad_type === '\u5e7f\u544a') return true;
+
+    /* ③ 推广对象 / 广告主信息 */
     if (o.promotion && o.promotion.type === 'ad') return true;
     if (o.ad_id && (o.ad_type || o.adType)) return true;
+    if (o.commentAdType) return true;
+    if (isFilled(o.ad_info) || isFilled(o.adInfo) || isFilled(o.ad_tag) || isFilled(o.ad_mark)) return true;
+
+    /* ④ 内容审核信息里带「广告」标签 */
+    if (o.content_auth_info) {
+        var title = String(o.content_auth_info.content_auth_title || '');
+        if (title.indexOf('\u5e7f\u544a') !== -1) return true;
+    }
+
+    /* ⑤ 信息流条目编码 */
+    if (typeof o.itemid === 'string' && AD_ITEMID.test(o.itemid)) return true;
+
+    /* ⑥ 超话 / 视频推荐卡 */
+    if (o.category === 'group' && o.trend_name && AD_TREND_NAMES[o.trend_name]) return true;
+
     return false;
+}
+
+/** 值为非空对象 / 非空字符串时才算「填充」，避免 ad_info:null 被当成广告 */
+function isFilled(v) {
+    if (!v) return false;
+    if (typeof v === 'string') return v.length > 0;
+    if (typeof v === 'object') {
+        for (var k in v) {
+            if (Object.prototype.hasOwnProperty.call(v, k)) return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * 广告挂件：条目本身是正常微博，但正文下面挂了品牌橱窗 / 语义推广位。
+ * 只删这些挂件字段，保留微博主体。
+ */
+function stripAdWidgets(o) {
+    if (!o || typeof o !== 'object') return 0;
+    var n = 0;
+    if (o.semantic_brand_params) { delete o.semantic_brand_params; n++; }
+    if (o.ad_tag_nature) { delete o.ad_tag_nature; n++; }
+    var ext = o.extend_info || o.extendInfo;
+    if (ext && typeof ext === 'object') {
+        if (ext.shopwindow_cards) { delete ext.shopwindow_cards; n++; }
+        if (ext.ad_semantic_brand) { delete ext.ad_semantic_brand; n++; }
+    }
+    return n;
 }
 
 /**
@@ -321,6 +401,7 @@ function filterCards(cards) {
         if (!c || typeof c !== 'object') continue;
         if (dropCard(c)) { cards.splice(i, 1); removed++; continue; }
         if (isArray(c.card_group)) removed += filterCardGroup(c.card_group);
+        if (c.mblog) removed += stripAdWidgets(c.mblog);
     }
     return removed;
 }
@@ -356,16 +437,26 @@ function filterItems(items) {
         var it = items[i];
         if (!it || typeof it !== 'object') continue;
         var d = it.data;
-        if (it.category === 'feed' && d && (d.mblogtype === 1 || d.mblogtype === '1')) {
+
+        // 条目本身或 data 内任意一层命中广告标记
+        if (isAd(it) || isAd(d)) { items.splice(i, 1); removed++; continue; }
+
+        // 超话 / 视频推荐卡：外层 category=group，内层 trend_name 标类型
+        if (it.category === 'group' && it.trend_name && AD_TREND_NAMES[it.trend_name]) {
             items.splice(i, 1);
             removed++;
             continue;
         }
+
+        // 广告卡 / 下载卡
         if (it.category === 'card' && d && (d.card_type === 118 || d.card_type === 89)) {
             items.splice(i, 1);
             removed++;
             continue;
         }
+
+        // 幸存的信息流条目：摘掉品牌橱窗等挂件
+        if (d && it.category === 'feed') removed += stripAdWidgets(d);
     }
     return removed;
 }
