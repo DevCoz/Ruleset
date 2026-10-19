@@ -1,44 +1,6 @@
 /**
- * weibo-noads.js  v1.2
+ * weibo-noads.js  v1.5
  * Surge http-response 脚本：清理微博 App 接口响应中的广告 / 推广条目
- *
- * 设计原则
- *   1. 只删「确定是广告」的节点，不整段清空业务数据；
- *   2. 同时兼容两代接口结构：老的 statuses / cards，新的 items / feed；
- *   3. 对 16 位以上整数（微博 id）做精度保护，避免 JSON.parse 改写 id；
- *   4. 任何异常都原样放行 —— 脚本出错绝不能导致 App 断网或白屏。
- *
- * v1.1 新增（对照 DevCoz/Ruleset 模块后补的判定，均已用差分用例验证）
- *   + itemid 中的广告位编码（c_type:51 / is_ad_pos / region_data ...）
- *   + mblogtypename / adType 取值「广告」「热推」
- *   + content_auth_info.content_auth_title 含「广告」
- *   + category=group + trend_name 的超话 / 视频推荐卡
- *   + 幸存条目上的品牌橱窗挂件（semantic_brand_params / shopwindow_cards）
- *   同时刻意**不采用**对方「对每个节点都 delete trend」的写法：
- *   实测会把话题页 / 超话页的业务数据一起删掉（见 test/compare-thirdparty.js）。
- *
- * v1.2 新增（对应真机反馈的两处漏广告）
- *   + 正文页评论流：adType=广告/荐读、type=15/41、readtimetype=adMblog
- *   + 应用下载广告：ads_material_info.is_ads=true
- *   + 热搜页 flowpage/flowlist：推广卡与推广热词（promotion 对象）
- *   + 搜索推广：actionlog.ext 含 ads_word、page_info.actionlog.source=ad
- *
- * v1.3 修复 WKErrorDomain:4（Surge 日志「发生了JavaScript异常」）
- *   根因：typeof null === 'object'，所以 `typeof $response !== 'undefined'`
- *   挡不住 $response 为 null 的情况，紧接着读 .body 直接抛 TypeError；
- *   而这行在 main() 首句、又在所有 try 之外，异常原样冒到宿主。
- *   $response 为 null 的场景很常见：URL Rewrite 的 reject、304 Not Modified、
- *   被复用到 http-request 阶段、Surge 内部拿不到响应体。
- *   修复：
- *     1. $request / $response 先判 truthy，再取字段；
- *     2. main() 外层加绝对兜底 try/catch，异常一律 $done({}) 原样放行；
- *     3. $done 加单次保护，避免重复回调触发宿主异常；
- *     4. 路由、序列化等原本在 try 外的调用全部收进 try；
- *     5. 节点预算，超大响应提前退出，避免执行超时被判为异常。
- *
- * 调试：在模块的脚本行里把 argument=debug=0 改成 argument=debug=1，
- *       Surge 的「脚本日志」会输出命中的 URL、删除数量与耗时；
- *       异常时会打印完整 stack，便于定位。
  */
 
 var DEBUG = (typeof $argument !== 'undefined' && $argument !== null) &&
@@ -47,7 +9,13 @@ var DEBUG = (typeof $argument !== 'undefined' && $argument !== null) &&
 /* 大整数保护用的占位前缀，尽量不可能出现在真实业务字符串里 */
 var BIG_PREFIX = '__WB_BIGINT_7f3c9a__';
 var BIG_INT_RE = new RegExp('"' + BIG_PREFIX + '(-?\\d+)"', 'g');
-var BIG_GUARD_RE = /("(?:[^"\\]|\\.)*")|(-?\d{16,})/g;
+/* 只匹配「完整的 JSON 数字字面量」，且必须是纯整数。
+   旧写法 /-?\d{16,}/ 会在 0.1234567890123456 里命中小数部分，
+   把 0."__WB__123..." 这种非法结构塞进 JSON，
+   JSON.parse 抛 "Invalid digits after decimal point"（JSC 的报错文案）。
+   现在要求：数字前面是 : [ , 或空白，后面是 , ] } 或结尾，
+   因此带小数点 / 指数的数字整体不匹配，交给 JSON.parse 按 double 处理。 */
+var BIG_GUARD_RE = /("(?:[^"\\]|\\.)*")|(^|[:\[,\s])(-?\d{16,})(?=\s*[,\]\}]|\s*$)/g;
 
 /* $done 只能调用一次；重复调用在部分 Surge 版本会抛宿主异常 */
 var DONE = false;
@@ -64,6 +32,11 @@ var nodeCount = 0;
 var TIME_BUDGET = 3000;
 var DEADLINE = 0;
 var ABORTED = false;
+
+/* 本次是否真的改动了数据。removed 只统计「删掉的条数」，
+   像 recommend_max_id 归零、unread_count.video 清空这类改动不计入条数，
+   若只看 removed 就会把它们当成「无变化」而丢失。 */
+var CHANGED = false;
 
 /* 超过这个字节数直接原样放行。
    4 MB JSON 在 iPhone 上 parse + 遍历 + 序列化很容易越过 Surge 默认的
@@ -82,6 +55,7 @@ function main() {
     DONE = false;
     nodeCount = 0;
     ABORTED = false;
+    CHANGED = false;
 
     /* 先判 truthy 再取字段：typeof null === 'object'，
        只判 undefined 挡不住 $request / $response 为 null 的情况 */
@@ -119,6 +93,15 @@ function main() {
         return;
     }
 
+    /* 非 JSON（HTML 页面、JS 文件、图片、protobuf）直接放行。
+       这类响应在 weibo.com / m.weibo.cn 上占比很高，
+       以前每次都进 JSON.parse 抛 "Unrecognized token '<'"，日志全是噪音。 */
+    if (!looksLikeJson(raw)) {
+        if (DEBUG) log('非 JSON 响应，跳过：' + url);
+        done();
+        return;
+    }
+
     var obj, handler, removed = 0, start = Date.now();
     DEADLINE = start + TIME_BUDGET;
 
@@ -149,6 +132,19 @@ function main() {
             return;
         }
 
+        /* 完全没有改动：透传原始字节。
+           重新 stringify 会把 1.0 写成 1、把带小数的长数字改精度，
+           既多花一次序列化的时间，也可能改变业务语义。 */
+        if (removed === 0 && !CHANGED) {
+            if (DEBUG) {
+                log('URL=' + url + ' | handler=' + (handler ? (handler.name || 'anonymous') : 'generic') +
+                    ' | removed=0 | nodes=' + nodeCount + ' | 未命中广告字段，原样透传' +
+                    ' | 顶层键：' + topKeys(obj));
+            }
+            done();
+            return;
+        }
+
         var out = stringifyJson(obj);
 
         if (DEBUG) {
@@ -156,8 +152,6 @@ function main() {
                 ' | removed=' + removed + ' | nodes=' + nodeCount +
                 ' | in=' + raw.length + 'B out=' + out.length +
                 'B | ' + (Date.now() - start) + 'ms');
-            // removed=0 时把顶层键打出来：能区分「接口选错了」和「字段没覆盖」
-            if (removed === 0) log('未命中广告字段，顶层键：' + topKeys(obj));
         }
 
         if (out === raw) {
@@ -166,7 +160,10 @@ function main() {
             done(out);
         }
     } catch (e) {
-        warn('处理异常，原样放行：' + describeError(e));
+        var msg = describeError(e);
+        /* 解析类异常补一段原文，能一眼看出是截断、编码还是格式问题 */
+        if (/JSON|parse|token|number/i.test(msg)) msg += ' | 头部=' + head(raw, 60);
+        warn('处理异常，原样放行：' + msg);
         done();
     }
 }
@@ -261,8 +258,10 @@ function handleTimeline(obj) {
     if (isArray(obj.trends)) removed += dropAdItems(obj.trends);
 
     // 微博用 original_num 记录「不含广告」的条数，num 含广告位
-    if (typeof obj.num === 'number' && typeof obj.original_num === 'number') {
+    if (typeof obj.num === 'number' && typeof obj.original_num === 'number' &&
+        obj.num !== obj.original_num) {
         obj.num = obj.original_num;
+        CHANGED = true;
     }
     return removed;
 }
@@ -311,7 +310,12 @@ function handleComments(obj) {
     if (isArray(obj.datas)) removed += dropAdCommentItems(obj.datas);
     if (isArray(obj.root_comments)) removed += dropAdCommentItems(obj.root_comments);
 
-    obj.recommend_max_id = 0;
+    /* recommend_max_id 必须归零，否则 App 会继续拉推荐评论。
+       只有真的改了才置位 CHANGED，避免把「无变化」也当成需要重写 body。 */
+    if (obj.recommend_max_id) {
+        obj.recommend_max_id = 0;
+        CHANGED = true;
+    }
 
     // 热评结构里夹带的广告回调，保留 max_id 后整块删除
     if (obj.top_hot_structs && obj.top_hot_structs.call_back_struct) {
@@ -441,13 +445,25 @@ function handleFinder(obj) {
 
 function handleUnreadCount(obj) {
     obj.video = {};
+    CHANGED = true;
     return 0;
 }
 
-function handleEmptyDatas(obj) { obj.datas = []; return 0; }
-function handleEmptyData(obj) { obj.data = {}; return 0; }
-function handleEmptyDataArray(obj) { obj.data = []; return 0; }
-function handleEmptyStories(obj) { obj.story_list = []; return 0; }
+/** 清空指定容器；只有原本非空才算一次修改，避免「无变化也重写 body」 */
+function clearContainer(obj, key, empty) {
+    var v = obj[key];
+    var n = isArray(v) ? v.length : (isFilled(v) ? 1 : 0);
+    if (n > 0) {
+        obj[key] = empty;
+        CHANGED = true;
+    }
+    return n;
+}
+
+function handleEmptyDatas(obj) { return clearContainer(obj, 'datas', []); }
+function handleEmptyData(obj) { return clearContainer(obj, 'data', {}); }
+function handleEmptyDataArray(obj) { return clearContainer(obj, 'data', []); }
+function handleEmptyStories(obj) { return clearContainer(obj, 'story_list', []); }
 
 /* ------------------------------------------------------------------ */
 /* 通用广告判定与遍历                                                  */
@@ -728,11 +744,25 @@ function filterItems(items) {
  */
 function parseJson(text) {
     BIG_GUARD_RE.lastIndex = 0;
-    var guarded = text.replace(BIG_GUARD_RE, function (m, str, num) {
+    var guarded = text.replace(BIG_GUARD_RE, function (m, str, lead, num) {
         if (str) return str;
-        return '"' + BIG_PREFIX + num + '"';
+        return lead + '"' + BIG_PREFIX + num + '"';
     });
     return JSON.parse(guarded);
+}
+
+/**
+ * 响应体是不是 JSON。
+ * weibo.com / m.weibo.cn 上大量请求返回的是 HTML、JS、图片，
+ * 直接 JSON.parse 会抛 "Unrecognized token '<'"，既污染日志也白费一次解析。
+ */
+function looksLikeJson(text) {
+    for (var i = 0; i < text.length && i < 64; i++) {
+        var c = text.charAt(i);
+        if (c === ' ' || c === '\n' || c === '\r' || c === '\t' || c === '\uFEFF') continue;
+        return c === '{' || c === '[';
+    }
+    return false;
 }
 
 function stringifyJson(obj) {
@@ -793,6 +823,13 @@ function describeError(e) {
     var s = (e.name || 'Error') + ': ' + (e.message || String(e));
     if (DEBUG && e.stack) s += '\n' + String(e.stack).split('\n').slice(0, 6).join('\n');
     return s;
+}
+
+/** 取响应体开头一小段并转义：日志里只占一行，够判断类型 */
+function head(text, n) {
+    if (typeof text !== 'string') return '';
+    var s = text.slice(0, n || 60).replace(/[\r\n\t]/g, ' ');
+    return s.length < text.length ? s + '…' : s;
 }
 
 /**
