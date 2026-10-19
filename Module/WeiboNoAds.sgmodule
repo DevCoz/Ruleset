@@ -1,0 +1,29 @@
+#!name=微博去广告（网络层）
+#!desc=拦截微博开屏 / 信息流 / 搜索 / 评论区 / 视频流广告与推广卡片。
+#!system=ios
+
+[Rule]
+# 微博广告投放平台
+DOMAIN-SUFFIX,ad.weibo.com,REJECT,pre-matching
+DOMAIN-SUFFIX,ad.weibo.cn,REJECT,pre-matching
+# 新浪广告交易 / 监测域
+DOMAIN-SUFFIX,mads.sina.com.cn,REJECT,pre-matching
+DOMAIN-SUFFIX,sax.sina.com.cn,REJECT,pre-matching
+DOMAIN-SUFFIX,saxn.sina.com.cn,REJECT,pre-matching
+DOMAIN-SUFFIX,ad.sina.com.cn,REJECT,pre-matching
+# 曝光监测像素：返回 1px GIF，避免 App 因连接失败而重试
+DOMAIN-SUFFIX,beacon.sina.com.cn,REJECT-TINYGIF
+
+[URL Rewrite]
+# 开屏广告物料清单（Lua）：直接拒绝
+^https?://(sdk|wb)app\.uve\.weibo\.com/wbapplua/wbpullad\.lua _ reject
+
+[Script]
+# 信息流 / 搜索 / 评论 / 视频流：按 JSON 字段删除广告条目
+weibo-feed = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/(cardlist|searchall|page|messageflow/notice|statuses/(unread_)?friends(/|_)timeline|statuses/(friends|video)(/|_)timeline|groups/timeline|fangle/timeline|statuses/(container_timeline|container_timeline_hot|container_timeline_unread|unread_hot_timeline|unread|extend|video_mixtimeline|repost_timeline|positives/get)|profile/(me|statuses|container_timeline)|video/(community_tab|remind_info|tiny_stream_video_list)|comments/build_comments|search/(finder|container_timeline|container_discover)|stories/(video_stream|home_list)|photo/(recommend_list|info)|service/picfeed|!/photos/pic_recommend_status|live/media_homelist|remind/unread_count),requires-body=1,max-size=5242880,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
+
+# 开屏广告配置（JSON）：返回空对象，比 reject 更温和
+weibo-launch = type=http-response,pattern=^https?://(sdk|wb)app\.uve\.weibo\.com/interface/sdk/sdkad\.php,requires-body=1,max-size=1048576,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-launch.js
+
+[MITM]
+hostname = %APPEND% api.weibo.cn, mapi.weibo.com, *.uve.weibo.com
