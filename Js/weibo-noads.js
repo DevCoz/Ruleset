@@ -23,24 +23,92 @@
  *   + 热搜页 flowpage/flowlist：推广卡与推广热词（promotion 对象）
  *   + 搜索推广：actionlog.ext 含 ads_word、page_info.actionlog.source=ad
  *
+ * v1.3 修复 WKErrorDomain:4（Surge 日志「发生了JavaScript异常」）
+ *   根因：typeof null === 'object'，所以 `typeof $response !== 'undefined'`
+ *   挡不住 $response 为 null 的情况，紧接着读 .body 直接抛 TypeError；
+ *   而这行在 main() 首句、又在所有 try 之外，异常原样冒到宿主。
+ *   $response 为 null 的场景很常见：URL Rewrite 的 reject、304 Not Modified、
+ *   被复用到 http-request 阶段、Surge 内部拿不到响应体。
+ *   修复：
+ *     1. $request / $response 先判 truthy，再取字段；
+ *     2. main() 外层加绝对兜底 try/catch，异常一律 $done({}) 原样放行；
+ *     3. $done 加单次保护，避免重复回调触发宿主异常；
+ *     4. 路由、序列化等原本在 try 外的调用全部收进 try；
+ *     5. 节点预算，超大响应提前退出，避免执行超时被判为异常。
+ *
  * 调试：在模块的脚本行里把 argument=debug=0 改成 argument=debug=1，
- *       Surge 的「脚本日志」会输出命中的 URL、删除数量与耗时。
+ *       Surge 的「脚本日志」会输出命中的 URL、删除数量与耗时；
+ *       异常时会打印完整 stack，便于定位。
  */
 
-var DEBUG = (typeof $argument !== 'undefined') && String($argument).indexOf('debug=1') !== -1;
+var DEBUG = (typeof $argument !== 'undefined' && $argument !== null) &&
+    String($argument).indexOf('debug=1') !== -1;
 
 /* 大整数保护用的占位前缀，尽量不可能出现在真实业务字符串里 */
 var BIG_PREFIX = '__WB_BIGINT_7f3c9a__';
+var BIG_INT_RE = new RegExp('"' + BIG_PREFIX + '(-?\\d+)"', 'g');
+var BIG_GUARD_RE = /("(?:[^"\\]|\\.)*")|(-?\d{16,})/g;
+
+/* $done 只能调用一次；重复调用在部分 Surge 版本会抛宿主异常 */
+var DONE = false;
+
+/* 单次执行的节点预算：正常信息流约 2~3 万节点，这里留 4 倍余量。
+   目的是让超大响应提前退出，而不是在 WKWebView 里跑到超时被判为异常。 */
+var NODE_BUDGET = 120000;
+var nodeCount = 0;
+
+/* 单次执行的时间预算。
+   Surge 的 [Script] 有个 timeout 参数，默认 5 秒，超时后会强制终止会话并报
+   「必须调用 $done() 结束脚本」。iPhone 的 JS 引擎比桌面慢 3~5 倍，
+   留给可控逻辑 3 秒，剩下 2 秒给 JSON.parse / JSON.stringify 与进程间通信。 */
+var TIME_BUDGET = 3000;
+var DEADLINE = 0;
+var ABORTED = false;
+
+/* 超过这个字节数直接原样放行。
+   4 MB JSON 在 iPhone 上 parse + 遍历 + 序列化很容易越过 Surge 默认的
+   5 秒 timeout，结果不是「慢一点」而是整条会话被终止（日志报
+   「必须调用 $done() 结束脚本」）。与其处理一半被中断，不如整条跳过。
+   模块里的 max-size 与这个值保持一致，让 Surge 在更外层就先挡住。 */
+var MAX_PROCESS_SIZE = 2621440; // 2.5 MB
 
 /* ------------------------------------------------------------------ */
 /* 入口                                                               */
 /* ------------------------------------------------------------------ */
 
 function main() {
-    var url = (typeof $request !== 'undefined' && $request.url) ? $request.url : '';
-    var raw = (typeof $response !== 'undefined') ? $response.body : null;
+    /* 每次执行都重置状态：Surge 通常为每个请求新建 JS 上下文，
+       但若复用上下文，残留的 DONE=true 会让 $done 永远不触发，表现为挂起 */
+    DONE = false;
+    nodeCount = 0;
+    ABORTED = false;
+
+    /* 先判 truthy 再取字段：typeof null === 'object'，
+       只判 undefined 挡不住 $request / $response 为 null 的情况 */
+    var req = (typeof $request !== 'undefined' && $request) ? $request : null;
+    var res = (typeof $response !== 'undefined' && $response) ? $response : null;
+
+    /* 没有响应上下文：http-request 阶段、URL Rewrite 已 reject、304 Not Modified、
+       或 Surge 未拿到响应体。这类情况必须原样放行，不能碰 .body */
+    if (!res) {
+        done();
+        return;
+    }
+
+    var url = (req && typeof req.url === 'string') ? req.url : '';
+    var raw = res.body;
 
     if (typeof raw !== 'string' || raw.length === 0) {
+        done();
+        return;
+    }
+
+    /* 超大响应直接跳过。
+       Ugly but necessary：4 MB 的 JSON 在 iPhone 上 parse + 遍历 + 序列化
+       很容易越过 Surge 的 5 秒 timeout，结果不是「慢一点」而是整条会话被终止。
+       跳过只损失这一条的去广告，不处理会连请求一起拖垮。 */
+    if (raw.length > MAX_PROCESS_SIZE) {
+        warn('响应 ' + raw.length + ' 字节超过处理上限 ' + MAX_PROCESS_SIZE + '，原样放行');
         done();
         return;
     }
@@ -51,45 +119,55 @@ function main() {
         return;
     }
 
-    var obj;
+    var obj, handler, removed = 0, start = Date.now();
+    DEADLINE = start + TIME_BUDGET;
+
+    /* 解析、路由、处理、序列化全部收进 try：
+       原先把 routeOf / pickHandler / stringifyJson 放在 try 外，
+       任何一处意外都会变成宿主级 WKErrorDomain:4 */
     try {
         obj = parseJson(raw);
-    } catch (e) {
-        log('JSON 解析失败，原样放行：' + e);
-        done();
-        return;
-    }
 
-    var start = Date.now();
-    var handler = pickHandler(routeOf(url));
-    var removed = 0;
+        if (!obj || typeof obj !== 'object') {
+            done();
+            return;
+        }
 
-    try {
+        handler = pickHandler(routeOf(url));
         if (handler) {
             removed = handler(obj) || 0;
         } else {
             removed = purge(obj, 0);
         }
+
+        /* 超预算：处理可能不完整，宁可原样放行也不返回半成品。
+           必须在 stringify 之前退出 —— 序列化本身也可能吃掉一两秒。 */
+        if (ABORTED || Date.now() > DEADLINE) {
+            warn('处理超预算（nodes=' + nodeCount + ', ' + (Date.now() - start) +
+                'ms），原样放行');
+            done();
+            return;
+        }
+
+        var out = stringifyJson(obj);
+
+        if (DEBUG) {
+            log('URL=' + url + ' | handler=' + (handler ? (handler.name || 'anonymous') : 'generic') +
+                ' | removed=' + removed + ' | nodes=' + nodeCount +
+                ' | in=' + raw.length + 'B out=' + out.length +
+                'B | ' + (Date.now() - start) + 'ms');
+            // removed=0 时把顶层键打出来：能区分「接口选错了」和「字段没覆盖」
+            if (removed === 0) log('未命中广告字段，顶层键：' + topKeys(obj));
+        }
+
+        if (out === raw) {
+            done();
+        } else {
+            done(out);
+        }
     } catch (e) {
-        log('处理异常，原样放行：' + e);
+        warn('处理异常，原样放行：' + describeError(e));
         done();
-        return;
-    }
-
-    var out = stringifyJson(obj);
-
-    if (DEBUG) {
-        log('URL=' + url + ' | handler=' + (handler ? handler.name : 'generic') +
-            ' | removed=' + removed + ' | in=' + raw.length + 'B out=' + out.length +
-            'B | ' + (Date.now() - start) + 'ms');
-        // removed=0 时把顶层键打出来：能区分「接口选错了」和「字段没覆盖」
-        if (removed === 0) log('未命中广告字段，顶层键：' + topKeys(obj));
-    }
-
-    if (out === raw) {
-        done();
-    } else {
-        done(out);
     }
 }
 
@@ -252,7 +330,7 @@ function dropAdCommentItems(list) {
         if (!it || typeof it !== 'object') continue;
         var t = Number(it.type);
         var tag = it.adType || it.ad_type;
-        if (COMMENT_AD_TYPES[t] || COMMENT_AD_TAGS[tag]) {
+        if (hasKey(COMMENT_AD_TYPES, t) || hasKey(COMMENT_AD_TAGS, tag)) {
             list.splice(i, 1);
             removed++;
         }
@@ -441,7 +519,7 @@ function isAd(o) {
     if (o.page_info && o.page_info.actionlog && o.page_info.actionlog.source === 'ad') return true;
 
     /* ⑦ 超话 / 视频推荐卡 */
-    if (o.category === 'group' && o.trend_name && AD_TREND_NAMES[o.trend_name]) return true;
+    if (o.category === 'group' && o.trend_name && hasKey(AD_TREND_NAMES, o.trend_name)) return true;
 
     return false;
 }
@@ -518,4 +596,234 @@ function isAdNode(o) {
     if (isCardAd(o)) return true;
 
     var d = o.data;
-    if (d && typeof 
+    if (d && typeof d === 'object') {
+        if (isAd(d) || isCardAd(d)) return true;
+        if (d.mblog && isAd(d.mblog)) return true;
+    }
+    if (o.mblog && isAd(o.mblog)) return true;
+
+    if ((o.category === 'group' || o.category === 'feed') &&
+        o.trend_name && hasKey(AD_TREND_NAMES, o.trend_name)) return true;
+
+    return false;
+}
+
+/**
+ * 深度遍历：数组里遇到广告项就删，对象继续向下找。
+ * depth 上限防止异常深层结构导致栈溢出 / 性能问题。
+ */
+function purge(node, depth) {
+    if (!node || typeof node !== 'object' || depth > 12) return 0;
+    if (ABORTED) return 0;
+
+    nodeCount++;
+    if (nodeCount > NODE_BUDGET) { ABORTED = true; return 0; }
+    /* 每 256 个节点看一次表：Date.now() 本身也有开销，不能每个节点都调 */
+    if ((nodeCount & 255) === 0 && Date.now() > DEADLINE) { ABORTED = true; return 0; }
+
+    var removed = 0;
+    var i, k, v;
+
+    if (isArray(node)) {
+        for (i = node.length - 1; i >= 0; i--) {
+            if (isAdNode(node[i])) {
+                node.splice(i, 1);
+                removed++;
+            } else {
+                removed += purge(node[i], depth + 1);
+            }
+        }
+        return removed;
+    }
+
+    // 对象：先摘广告挂件、清空广告容器，再继续向下
+    removed += stripAdWidgets(node);
+    removed += emptyAdContainers(node);
+
+    for (k in node) {
+        if (!Object.prototype.hasOwnProperty.call(node, k)) continue;
+        v = node[k];
+        if (v && typeof v === 'object') removed += purge(v, depth + 1);
+    }
+    return removed;
+}
+
+function dropAdItems(arr) {
+    var removed = 0;
+    for (var i = arr.length - 1; i >= 0; i--) {
+        if (isAdNode(arr[i])) { arr.splice(i, 1); removed++; }
+    }
+    return removed;
+}
+
+/** cards[] 顶层卡片过滤 */
+function filterCards(cards) {
+    var removed = 0;
+    for (var i = cards.length - 1; i >= 0; i--) {
+        var c = cards[i];
+        if (!c || typeof c !== 'object') continue;
+        if (dropCard(c)) { cards.splice(i, 1); removed++; continue; }
+        if (isArray(c.card_group)) removed += filterCardGroup(c.card_group);
+        if (c.mblog) removed += stripAdWidgets(c.mblog);
+    }
+    return removed;
+}
+
+function filterCardGroup(group) {
+    var removed = 0;
+    for (var i = group.length - 1; i >= 0; i--) {
+        var item = group[i];
+        if (!item || typeof item !== 'object') continue;
+        if (dropCard(item) || isAdNode(item) || hasPromotion(item)) {
+            group.splice(i, 1);
+            removed++;
+            continue;
+        }
+        if (isArray(item.card_group)) removed += filterCardGroup(item.card_group);
+        if (isArray(item.group)) removed += filterCardGroup(item.group);
+    }
+    return removed;
+}
+
+function dropCard(c) {
+    var t = c.card_type;
+    if (isCardAd(c)) return true;                                    // 118 广告卡 / 89 下载卡
+    if (t === 42 && c.desc === '\u53ef\u80fd\u611f\u5174\u8da3\u7684\u4eba') return true; // 可能感兴趣的人
+    if (t === 9 && isAd(c.mblog)) return true;                       // 信息流广告卡
+    return false;
+}
+
+/** 新版 items[] 过滤（搜索、容器时间线、消息流共用） */
+function filterItems(items) {
+    var removed = 0;
+    for (var i = items.length - 1; i >= 0; i--) {
+        var it = items[i];
+        if (!it || typeof it !== 'object') continue;
+        var d = it.data;
+
+        // 条目本身或 data 内任意一层命中广告标记
+        if (isAdNode(it)) { items.splice(i, 1); removed++; continue; }
+
+        // 广告卡 / 下载卡
+        if (it.category === 'card' && d && isCardAd(d)) {
+            items.splice(i, 1);
+            removed++;
+            continue;
+        }
+
+        // 幸存的信息流条目：摘掉品牌橱窗等挂件
+        if (d && it.category === 'feed') removed += stripAdWidgets(d);
+    }
+    return removed;
+}
+
+/* ------------------------------------------------------------------ */
+/* JSON 读写（含大整数精度保护）                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * JSON.parse 会把 > 2^53 的整数转成 double，微博 id 普遍 16 位，
+ * 直接 parse/stringify 会把 id 末几位改成 0，导致点击、翻页异常。
+ * 做法：先把长整数临时包成字符串，序列化后再把引号去掉。
+ */
+function parseJson(text) {
+    BIG_GUARD_RE.lastIndex = 0;
+    var guarded = text.replace(BIG_GUARD_RE, function (m, str, num) {
+        if (str) return str;
+        return '"' + BIG_PREFIX + num + '"';
+    });
+    return JSON.parse(guarded);
+}
+
+function stringifyJson(obj) {
+    return JSON.stringify(obj).replace(BIG_INT_RE, '$1');
+}
+
+/* ------------------------------------------------------------------ */
+/* 工具                                                                */
+/* ------------------------------------------------------------------ */
+
+function isArray(v) {
+    /* Array.isArray 是原生实现，比 Object.prototype.toString.call 快一个数量级。
+       emptyAdContainers 会对每个节点调用 14 次，这里是最大的性能热点。 */
+    if (typeof Array.isArray === 'function') return Array.isArray(v);
+    return Object.prototype.toString.call(v) === '[object Array]';
+}
+
+/**
+ * 字典查表必须用 hasOwnProperty：
+ * 直接写 dict[key] 时，key="constructor" / "toString" 会命中原型链上的函数，
+ * 得到一个 truthy 值，把正常内容当广告删掉。
+ */
+function hasKey(dict, key) {
+    if (typeof key !== 'string' && typeof key !== 'number') return false;
+    return Object.prototype.hasOwnProperty.call(dict, key);
+}
+
+/** 调试用：列出顶层键，避免把整个响应体写进日志 */
+function topKeys(o) {
+    if (!o || typeof o !== 'object') return typeof o;
+    var keys = [];
+    for (var k in o) {
+        if (Object.prototype.hasOwnProperty.call(o, k)) keys.push(k);
+    }
+    return keys.slice(0, 24).join(',');
+}
+
+function log(msg) {
+    if (DEBUG && typeof console !== 'undefined' && console && console.log) {
+        try { console.log('[weibo-noads] ' + msg); } catch (e) { /* 日志失败不影响放行 */ }
+    }
+}
+
+/**
+ * 异常日志：不受 DEBUG 限制。
+ * 异常是罕见事件，如果只在 DEBUG 下才打印，用户看到 Surge 的
+ * 「发生了JavaScript异常」却拿不到任何上下文，等于没法排查。
+ */
+function warn(msg) {
+    if (typeof console !== 'undefined' && console && console.log) {
+        try { console.log('[weibo-noads][error] ' + msg); } catch (e) {}
+    }
+}
+
+/** 把异常整理成一行可读文本，DEBUG 时便于定位；非 DEBUG 不输出 */
+function describeError(e) {
+    if (!e) return 'unknown';
+    var s = (e.name || 'Error') + ': ' + (e.message || String(e));
+    if (DEBUG && e.stack) s += '\n' + String(e.stack).split('\n').slice(0, 6).join('\n');
+    return s;
+}
+
+/**
+ * 统一出口：不传 body 表示原样放行。
+ * $done 只允许调用一次 —— 重复回调在部分 Surge 版本会抛宿主异常，
+ * 而异常又会被记成 WKErrorDomain:4，等于自己制造故障。
+ */
+function done(body) {
+    if (DONE) return;
+    DONE = true;
+    try {
+        if (typeof body === 'string') {
+            $done({ body: body });
+        } else {
+            $done({});
+        }
+    } catch (e) {
+        /* 宿主会话已销毁时 $done 可能抛错，这里必须吞掉：
+           再次抛出就会变成 Surge 日志里的「发生了JavaScript异常」 */
+        if (DEBUG && typeof console !== 'undefined' && console && console.log) {
+            try { console.log('[weibo-noads] $done 失败：' + describeError(e)); } catch (e2) {}
+        }
+    }
+}
+
+/* 入口放在文件末尾：确保上面的常量表已完成赋值（var 不会提升赋值）。
+   最外层再包一层绝对兜底 —— main() 里已经分块 try，但常量初始化、
+   函数求值阶段仍可能有意料之外的问题，绝不能让异常冒到宿主。 */
+try {
+    main();
+} catch (e) {
+    warn('未捕获异常，原样放行：' + describeError(e));
+    done();
+}
