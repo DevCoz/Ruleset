@@ -2,6 +2,7 @@
 #!desc=拦截微博开屏 / 信息流 / 搜索 / 评论区 / 视频流 / H5 / 私信广告与推广卡片。
 #!category=BetaModule
 
+[Rule]
 # 微博广告投放平台
 DOMAIN-SUFFIX,ad.weibo.com,REJECT,pre-matching
 DOMAIN-SUFFIX,ad.weibo.cn,REJECT,pre-matching
@@ -26,13 +27,13 @@ weibo-feed = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/(cardl
 
 # ② /2/ 兜底：正文页、关注推荐等未逐一枚举的接口。
 #    走通用深度清理；4 MB 上限覆盖评论较多的正文页（超限响应仍会原样放行）。
-weibo-any = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/,requires-body=1,max-size=4194304,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
+weibo-any = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/,requires-body=1,max-size=4194304,argument=debug=1,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
 
 # ③ H5 / 网页版 / 私信 / 会员页：这些域不在 /2/ 下，是「看得见但抓不到」的主要来源
-weibo-web = type=http-response,pattern=^https?://(m\.weibo\.cn|weibo\.com|www\.weibo\.com|api-cloudim\.api\.weibo\.com|new\.vip\.weibo\.cn|card\.weibo\.com|biz\.weibo\.com)/,requires-body=1,max-size=4194304,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
+weibo-web = type=http-response,pattern=^https?://(m\.weibo\.cn|weibo\.com|www\.weibo\.com|api-cloudim\.api\.weibo\.com|new\.vip\.weibo\.cn|card\.weibo\.com|biz\.weibo\.com)/,requires-body=1,max-size=4194304,argument=debug=1,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
 
 # ④ 开屏广告配置（JSON）：返回空对象，比 reject 更温和
-weibo-launch = type=http-response,pattern=^https?://(sdk|wb)app\.uve\.weibo\.com/interface/sdk/sdkad\.php,requires-body=1,max-size=1048576,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-launch.js
+weibo-launch = type=http-response,pattern=^https?://(sdk|wb)app\.uve\.weibo\.com/interface/sdk/sdkad\.php,requires-body=1,max-size=1048576,argument=debug=1,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-launch.js
 
 [MITM]
 hostname = %APPEND% api.weibo.cn, api.weibo.com, mapi.weibo.com, mapi.weibo.cn, *.uve.weibo.com, m.weibo.cn, weibo.com, www.weibo.com, api-cloudim.api.weibo.com, new.vip.weibo.cn, card.weibo.com, biz.weibo.com
