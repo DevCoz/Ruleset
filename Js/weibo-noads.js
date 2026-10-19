@@ -1,5 +1,5 @@
 /**
- * weibo-noads.js  v1.1
+ * weibo-noads.js  v1.2
  * Surge http-response 脚本：清理微博 App 接口响应中的广告 / 推广条目
  *
  * 设计原则
@@ -16,6 +16,12 @@
  *   + 幸存条目上的品牌橱窗挂件（semantic_brand_params / shopwindow_cards）
  *   同时刻意**不采用**对方「对每个节点都 delete trend」的写法：
  *   实测会把话题页 / 超话页的业务数据一起删掉（见 test/compare-thirdparty.js）。
+ *
+ * v1.2 新增（对应真机反馈的两处漏广告）
+ *   + 正文页评论流：adType=广告/荐读、type=15/41、readtimetype=adMblog
+ *   + 应用下载广告：ads_material_info.is_ads=true
+ *   + 热搜页 flowpage/flowlist：推广卡与推广热词（promotion 对象）
+ *   + 搜索推广：actionlog.ext 含 ads_word、page_info.actionlog.source=ad
  *
  * 调试：在模块的脚本行里把 argument=debug=0 改成 argument=debug=1，
  *       Surge 的「脚本日志」会输出命中的 URL、删除数量与耗时。
@@ -76,6 +82,8 @@ function main() {
         log('URL=' + url + ' | handler=' + (handler ? handler.name : 'generic') +
             ' | removed=' + removed + ' | in=' + raw.length + 'B out=' + out.length +
             'B | ' + (Date.now() - start) + 'ms');
+        // removed=0 时把顶层键打出来：能区分「接口选错了」和「字段没覆盖」
+        if (removed === 0) log('未命中广告字段，顶层键：' + topKeys(obj));
     }
 
     if (out === raw) {
@@ -121,6 +129,8 @@ var CARDS = [
 function pickHandler(route) {
     // 1) 精确/前缀匹配的独立接口
     if (route === 'comments/build_comments') return handleComments;
+    if (route === 'flowpage') return handleFlowPage;
+    if (route === 'flowlist') return handleFlowList;
     if (route === 'statuses/extend') return handleExtend;
     if (route === 'statuses/positives/get') return handleEmptyDatas;
     if (route === 'photo/recommend_list' || route === '!/photos/pic_recommend_status') return handleEmptyData;
@@ -203,19 +213,26 @@ function handleItems(obj) {
     return removed;
 }
 
-/** 评论区：datas[] 中 type 1/5/6 为广告与推荐楼中楼 */
+/* 评论流里的广告包装类型：1/5/6 是老版本，15/41 是新版本（过滤提示、氛围调查） */
+var COMMENT_AD_TYPES = { 1: 1, 5: 1, 6: 1, 15: 1, 41: 1 };
+
+/* 评论条目 adType 的取值表，只认这些明确表示推广/推荐的标签 */
+var COMMENT_AD_TAGS = {
+    '\u5e7f\u544a': 1,                 // 广告
+    '\u8350\u8bfb': 1,                 // 荐读
+    '\u8bc4\u8bba\u603b\u7ed3': 1,     // 评论总结
+    '\u63a8\u8350': 1,                 // 推荐
+    '\u76f8\u5173\u5185\u5bb9': 1,     // 相关内容
+    '\u76f8\u5173\u8bc4\u8bba': 1      // 相关评论
+};
+
+/** 评论区：datas[] / root_comments[] 中带广告类型或 adType 标签的条目 */
 function handleComments(obj) {
     var removed = purge(obj, 0);
 
-    if (isArray(obj.datas)) {
-        for (var i = obj.datas.length - 1; i >= 0; i--) {
-            var t = obj.datas[i] && obj.datas[i].type;
-            if (t === 1 || t === 5 || t === 6) {
-                obj.datas.splice(i, 1);
-                removed++;
-            }
-        }
-    }
+    if (isArray(obj.datas)) removed += dropAdCommentItems(obj.datas);
+    if (isArray(obj.root_comments)) removed += dropAdCommentItems(obj.root_comments);
+
     obj.recommend_max_id = 0;
 
     // 热评结构里夹带的广告回调，保留 max_id 后整块删除
@@ -224,6 +241,86 @@ function handleComments(obj) {
         if (typeof cb.max_id !== 'undefined') obj.max_id = cb.max_id;
         delete obj.top_hot_structs;
         removed++;
+    }
+    return removed;
+}
+
+function dropAdCommentItems(list) {
+    var removed = 0;
+    for (var i = list.length - 1; i >= 0; i--) {
+        var it = list[i];
+        if (!it || typeof it !== 'object') continue;
+        var t = Number(it.type);
+        var tag = it.adType || it.ad_type;
+        if (COMMENT_AD_TYPES[t] || COMMENT_AD_TAGS[tag]) {
+            list.splice(i, 1);
+            removed++;
+        }
+    }
+    return removed;
+}
+
+/**
+ * 热搜页（/2/flowpage）：items[] 里既有榜单分组，也有推广横幅。
+ * 推广位的特征：
+ *   - 条目本身带 promotion（热点页顶部品牌横幅）
+ *   - 分组 items[] 里的单个热搜词带 promotion
+ *   - 手动置顶热搜用 pic 里的 _img_search_stick 标记
+ *   - 顶部「开启推送通知」提示条 itemid=hot-search-push-notice
+ */
+function handleFlowPage(obj) {
+    var removed = purge(obj, 0);
+    if (!isArray(obj.items)) return removed;
+
+    for (var i = obj.items.length - 1; i >= 0; i--) {
+        var it = obj.items[i];
+        if (!it || typeof it !== 'object') continue;
+
+        var d = it.data;
+        if (d && d.itemid === 'hot-search-push-notice') {
+            obj.items.splice(i, 1);
+            removed++;
+            continue;
+        }
+        if (isAdNode(it) || hasPromotion(it) || hasPromotion(d)) {
+            obj.items.splice(i, 1);
+            removed++;
+            continue;
+        }
+
+        if (isArray(it.items)) {
+            for (var j = it.items.length - 1; j >= 0; j--) {
+                var x = it.items[j];
+                if (!x || typeof x !== 'object') continue;
+                var xd = x.data;
+                var pinned = xd && /_img_search_stick/.test(String(xd.pic || ''));
+                if (isAdNode(x) || pinned || hasPromotion(x) || hasPromotion(xd)) {
+                    it.items.splice(j, 1);
+                    removed++;
+                }
+            }
+        }
+    }
+    return removed;
+}
+
+/** 关注页 / 热搜列表（/2/flowlist）：清掉分组里的推广条目 */
+function handleFlowList(obj) {
+    var removed = purge(obj, 0);
+
+    if (isArray(obj.items)) {
+        for (var k = 0; k < obj.items.length; k++) {
+            var group = obj.items[k];
+            if (!group || !isArray(group.items)) continue;
+            for (var j = group.items.length - 1; j >= 0; j--) {
+                var x = group.items[j];
+                if (!x || typeof x !== 'object') continue;
+                if (isAdNode(x) || hasPromotion(x) || hasPromotion(x.data)) {
+                    group.items.splice(j, 1);
+                    removed++;
+                }
+            }
+        }
     }
     return removed;
 }
@@ -283,7 +380,7 @@ function handleEmptyStories(obj) { obj.story_list = []; return 0; }
  * 这里只匹配已知的广告片段，不做「含 ad 就算广告」这种模糊判断，
  * 否则 ad_mark / download 这类正常词都会被误伤。
  */
-var AD_ITEMID = /c_type:51|is_ad_pos|region_data|infeed_may_interest_in|infeed_friends_recommend/;
+var AD_ITEMID = /c_type:51|t:51|is_ad_pos|region_data|infeed_may_interest_in|infeed_friends_recommend|infeed_weibo_mall|feed_-_invite|ads_word/;
 
 /* 超话 / 视频的推荐卡：字段是 category=group + trend_name，不是 mblogtype */
 var AD_TREND_NAMES = {
@@ -304,27 +401,46 @@ function isAd(o) {
     if (o.ad_state === true || o.ad_state === 1) return true;
     if (o.mblogtype === 1 || o.mblogtype === '1') return true;
 
-    /* ② 文案标记：只认「广告 / 热推」这两个确切值，「热门」不能删 */
-    var mt = o.mblogtypename;
-    if (mt === '\u5e7f\u544a' || mt === '\u70ed\u63a8') return true;
-    if (o.adType === '\u5e7f\u544a' || o.ad_type === '\u5e7f\u544a') return true;
+    /* ② 正文页 / 评论流 / 下载类广告的专用标记（v1.2） */
+    // 评论流里插播的推广博文，客户端按 adMblog 走广告样式
+    if (o.readtimetype === 'adMblog') return true;
+    // 「APP 下载」这类广告素材会带 is_ads=true
+    var material = o.ads_material_info || o.adsMaterialInfo;
+    if (material && material.is_ads === true) return true;
 
-    /* ③ 推广对象 / 广告主信息 */
-    if (o.promotion && o.promotion.type === 'ad') return true;
+    /* ③ 文案标记：只认「广告 / 热推」这两个词，「热门」不能删 */
+    var mt = o.mblogtypename || o.mblogtypename_v2 || '';
+    if (typeof mt === 'string' && (mt.indexOf('\u5e7f\u544a') !== -1 || mt.indexOf('\u70ed\u63a8') !== -1)) return true;
+    if (typeof o.adType === 'string' && o.adType.indexOf('\u5e7f\u544a') !== -1) return true;
+    if (typeof o.ad_type === 'string' && o.ad_type.indexOf('\u5e7f\u544a') !== -1) return true;
+
+    /* ④ 推广对象 / 广告主信息 */
+    if (o.promotion && typeof o.promotion === 'object') {
+        var ptype = String(o.promotion.type || '');
+        if (ptype.indexOf('ad') !== -1) return true;
+        if (o.promotion.recommend === '\u5e7f\u544a' || o.promotion.recommend === '\u70ed\u63a8') return true;
+    }
     if (o.ad_id && (o.ad_type || o.adType)) return true;
     if (o.commentAdType) return true;
     if (isFilled(o.ad_info) || isFilled(o.adInfo) || isFilled(o.ad_tag) || isFilled(o.ad_mark)) return true;
 
-    /* ④ 内容审核信息里带「广告」标签 */
+    /* 广告容器本身：只有「填充过」才算，避免 ad:{} / ads:[] 误判 */
+    if (isFilled(o.ad) || isFilled(o.ads) || isFilled(o.advertise) || isFilled(o.promotions)) return true;
+
+    /* ⑤ 内容审核信息里带「广告」标签 */
     if (o.content_auth_info) {
         var title = String(o.content_auth_info.content_auth_title || '');
         if (title.indexOf('\u5e7f\u544a') !== -1) return true;
     }
 
-    /* ⑤ 信息流条目编码 */
+    /* ⑥ 信息流条目编码与搜索推广标记 */
     if (typeof o.itemid === 'string' && AD_ITEMID.test(o.itemid)) return true;
+    if (typeof o.itemId === 'string' && AD_ITEMID.test(o.itemId)) return true;
+    if (o.actionlog && typeof o.actionlog.ext === 'string' &&
+        o.actionlog.ext.indexOf('ads_word') !== -1) return true;
+    if (o.page_info && o.page_info.actionlog && o.page_info.actionlog.source === 'ad') return true;
 
-    /* ⑥ 超话 / 视频推荐卡 */
+    /* ⑦ 超话 / 视频推荐卡 */
     if (o.category === 'group' && o.trend_name && AD_TREND_NAMES[o.trend_name]) return true;
 
     return false;
@@ -342,6 +458,11 @@ function isFilled(v) {
     return false;
 }
 
+/** 推广位判定：热搜 / 发现页的条目常常只给 promotion 对象，不带 type */
+function hasPromotion(o) {
+    return !!(o && typeof o === 'object' && isFilled(o.promotion));
+}
+
 /**
  * 广告挂件：条目本身是正常微博，但正文下面挂了品牌橱窗 / 语义推广位。
  * 只删这些挂件字段，保留微博主体。
@@ -351,6 +472,7 @@ function stripAdWidgets(o) {
     var n = 0;
     if (o.semantic_brand_params) { delete o.semantic_brand_params; n++; }
     if (o.ad_tag_nature) { delete o.ad_tag_nature; n++; }
+    if (o.page_alerts) { delete o.page_alerts; n++; }
     var ext = o.extend_info || o.extendInfo;
     if (ext && typeof ext === 'object') {
         if (ext.shopwindow_cards) { delete ext.shopwindow_cards; n++; }
@@ -359,151 +481,41 @@ function stripAdWidgets(o) {
     return n;
 }
 
-/**
- * 深度遍历：数组里遇到广告项就删，对象继续向下找。
- * depth 上限防止异常深层结构导致栈溢出 / 性能问题。
- */
-function purge(node, depth) {
-    if (!node || typeof node !== 'object' || depth > 12) return 0;
-    var removed = 0;
-    if (isArray(node)) {
-        for (var i = node.length - 1; i >= 0; i--) {
-            if (isAd(node[i])) {
-                node.splice(i, 1);
-                removed++;
-            } else {
-                removed += purge(node[i], depth + 1);
-            }
-        }
-        return removed;
+/* 顶层广告容器：命中就清空，里面的元素不用逐个判 */
+var AD_CONTAINERS = [
+    'ad', 'ads', 'advertises', 'advertise', 'ad_cards', 'promotion_ads',
+    'comment_ad', 'comment_ads', 'top_ad', 'top_ads', 'hot_ad', 'hot_ads',
+    'ad_banner', 'banner_ad'
+];
+
+function emptyAdContainers(o) {
+    var n = 0;
+    for (var i = 0; i < AD_CONTAINERS.length; i++) {
+        var k = AD_CONTAINERS[i];
+        var v = o[k];
+        if (isArray(v) && v.length) { n += v.length; o[k] = []; }
+        else if (v && typeof v === 'object' && !isArray(v) && isFilled(v)) { delete o[k]; n++; }
     }
-    for (var k in node) {
-        if (!Object.prototype.hasOwnProperty.call(node, k)) continue;
-        var v = node[k];
-        if (v && typeof v === 'object') removed += purge(v, depth + 1);
-    }
-    return removed;
+    return n;
 }
 
-function dropAdItems(arr) {
-    var removed = 0;
-    for (var i = arr.length - 1; i >= 0; i--) {
-        if (isAd(arr[i])) { arr.splice(i, 1); removed++; }
-    }
-    return removed;
-}
-
-/** cards[] 顶层卡片过滤 */
-function filterCards(cards) {
-    var removed = 0;
-    for (var i = cards.length - 1; i >= 0; i--) {
-        var c = cards[i];
-        if (!c || typeof c !== 'object') continue;
-        if (dropCard(c)) { cards.splice(i, 1); removed++; continue; }
-        if (isArray(c.card_group)) removed += filterCardGroup(c.card_group);
-        if (c.mblog) removed += stripAdWidgets(c.mblog);
-    }
-    return removed;
-}
-
-function filterCardGroup(group) {
-    var removed = 0;
-    for (var i = group.length - 1; i >= 0; i--) {
-        var item = group[i];
-        if (!item || typeof item !== 'object') continue;
-        if (dropCard(item) || item.promotion) {
-            group.splice(i, 1);
-            removed++;
-            continue;
-        }
-        if (isArray(item.card_group)) removed += filterCardGroup(item.card_group);
-        if (isArray(item.group)) removed += filterCardGroup(item.group);
-    }
-    return removed;
-}
-
-function dropCard(c) {
-    var t = c.card_type;
-    if (t === 118 || t === 89) return true;                          // 纯广告 / 下载卡
-    if (t === 42 && c.desc === '\u53ef\u80fd\u611f\u5174\u8da3\u7684\u4eba') return true; // 可能感兴趣的人
-    if (t === 9 && isAd(c.mblog)) return true;                       // 信息流广告卡
+/** 卡片类型判广告：118 广告卡、89 下载卡，以及挂着 promotion 的推广卡 */
+function isCardAd(o) {
+    if (!o || typeof o !== 'object') return false;
+    if (o.card_type === 118 || o.card_type === 89) return true;
+    if (typeof o.card_type !== 'undefined' && hasPromotion(o)) return true;
     return false;
 }
 
-/** 新版 items[] 过滤（搜索、容器时间线、消息流共用） */
-function filterItems(items) {
-    var removed = 0;
-    for (var i = items.length - 1; i >= 0; i--) {
-        var it = items[i];
-        if (!it || typeof it !== 'object') continue;
-        var d = it.data;
-
-        // 条目本身或 data 内任意一层命中广告标记
-        if (isAd(it) || isAd(d)) { items.splice(i, 1); removed++; continue; }
-
-        // 超话 / 视频推荐卡：外层 category=group，内层 trend_name 标类型
-        if (it.category === 'group' && it.trend_name && AD_TREND_NAMES[it.trend_name]) {
-            items.splice(i, 1);
-            removed++;
-            continue;
-        }
-
-        // 广告卡 / 下载卡
-        if (it.category === 'card' && d && (d.card_type === 118 || d.card_type === 89)) {
-            items.splice(i, 1);
-            removed++;
-            continue;
-        }
-
-        // 幸存的信息流条目：摘掉品牌橱窗等挂件
-        if (d && it.category === 'feed') removed += stripAdWidgets(d);
-    }
-    return removed;
-}
-
-/* ------------------------------------------------------------------ */
-/* JSON 读写（含大整数精度保护）                                        */
-/* ------------------------------------------------------------------ */
-
 /**
- * JSON.parse 会把 > 2^53 的整数转成 double，微博 id 普遍 16 位，
- * 直接 parse/stringify 会把 id 末几位改成 0，导致点击、翻页异常。
- * 做法：先把长整数临时包成字符串，序列化后再把引号去掉。
+ * 节点级判定：一个数组元素是否该整条删除。
+ * 除了节点自身，还要看它的 data / mblog 子节点 —— H5、容器时间线、
+ * 私信消息流的包装层都不一样，只判一层必然漏。
  */
-function parseJson(text) {
-    var guarded = text.replace(/("(?:[^"\\]|\\.)*")|(-?\d{16,})/g, function (m, str, num) {
-        if (str) return str;
-        return '"' + BIG_PREFIX + num + '"';
-    });
-    return JSON.parse(guarded);
-}
+function isAdNode(o) {
+    if (!o || typeof o !== 'object') return false;
+    if (isAd(o)) return true;
+    if (isCardAd(o)) return true;
 
-function stringifyJson(obj) {
-    var s = JSON.stringify(obj);
-    var re = new RegExp('"' + BIG_PREFIX + '(-?\\d+)"', 'g');
-    return s.replace(re, '$1');
-}
-
-/* ------------------------------------------------------------------ */
-/* 工具                                                                */
-/* ------------------------------------------------------------------ */
-
-function isArray(v) {
-    return Object.prototype.toString.call(v) === '[object Array]';
-}
-
-function log(msg) {
-    if (DEBUG && typeof console !== 'undefined' && console.log) console.log('[weibo-noads] ' + msg);
-}
-
-/** 统一出口：不传 body 表示原样放行 */
-function done(body) {
-    if (typeof body === 'string') {
-        $done({ body: body });
-    } else {
-        $done({});
-    }
-}
-
-/* 入口放在文件末尾：确保上面的常量表已完成赋值（var 不会提升赋值） */
-main();
+    var d = o.data;
+    if (d && typeof 
