@@ -2,7 +2,6 @@
 #!desc=拦截微博开屏 / 信息流 / 搜索 / 评论区 / 视频流 / H5 / 私信广告与推广卡片。
 #!category=BetaModule
 
-[Rule]
 # 微博广告投放平台
 DOMAIN-SUFFIX,ad.weibo.com,REJECT,pre-matching
 DOMAIN-SUFFIX,ad.weibo.cn,REJECT,pre-matching
@@ -19,18 +18,21 @@ DOMAIN-SUFFIX,beacon.sina.com.cn,REJECT-TINYGIF
 ^https?://(sdk|wb)app\.uve\.weibo\.com/wbapplua/wbpullad\.lua _ reject
 
 [Script]
+# 注意顺序：Surge 每个响应只执行「第一个命中的脚本」，
+# 所以专用行（大 body 上限）放前面，兜底行放后面。
+#
 # ① 已知业务接口：有专门 handler，逐字段精准处理，放宽 body 上限
-weibo-feed = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/(cardlist|searchall|page|messageflow/notice|statuses/(unread_)?friends(/|_)timeline|statuses/(friends|video)(/|_)timeline|groups/timeline|fangle/timeline|statuses/(container_timeline|container_timeline_hot|container_timeline_unread|unread_hot_timeline|unread|extend|video_mixtimeline|repost_timeline|positives/get)|profile/(me|statuses|container_timeline)|video/(community_tab|remind_info|tiny_stream_video_list)|comments/build_comments|search/(finder|container_timeline|container_discover)|stories/(video_stream|home_list)|photo/(recommend_list|info)|service/picfeed|!/photos/pic_recommend_status|live/media_homelist|remind/unread_count),requires-body=1,max-size=5242880,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
+weibo-feed = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/(cardlist|searchall|page|messageflow/notice|statuses/(unread_)?friends(/|_)timeline|statuses/(friends|video)(/|_)timeline|groups/timeline|fangle/timeline|statuses/(container_timeline|container_timeline_hot|container_timeline_unread|unread_hot_timeline|unread|extend|video_mixtimeline|repost_timeline|positives/get|show)|profile/(me|statuses|container_timeline)|video/(community_tab|remind_info|tiny_stream_video_list)|comments/(build_comments|show)|flowpage|flowlist|container/asyn|search/(finder|container_timeline|container_discover)|stories/(video_stream|home_list)|photo/(recommend_list|info)|service/picfeed|!/photos/pic_recommend_status|live/media_homelist|remind/unread_count),requires-body=1,max-size=5242880,argument=debug=1,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
 
-# ② /2/ 兜底：正文页、评论列表、关注推荐等未逐一枚举的接口。
-#    走通用深度清理，1 MB 上限控制内存；超限的响应由 Surge 原样放行。
-weibo-any = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/,requires-body=1,max-size=1048576,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
+# ② /2/ 兜底：正文页、关注推荐等未逐一枚举的接口。
+#    走通用深度清理；4 MB 上限覆盖评论较多的正文页（超限响应仍会原样放行）。
+weibo-any = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/,requires-body=1,max-size=4194304,argument=debug=1,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
 
 # ③ H5 / 网页版 / 私信 / 会员页：这些域不在 /2/ 下，是「看得见但抓不到」的主要来源
-weibo-web = type=http-response,pattern=^https?://(m\.weibo\.cn|weibo\.com|www\.weibo\.com|api-cloudim\.api\.weibo\.com|new\.vip\.weibo\.cn|card\.weibo\.com|biz\.weibo\.com)/,requires-body=1,max-size=2097152,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
+weibo-web = type=http-response,pattern=^https?://(m\.weibo\.cn|weibo\.com|www\.weibo\.com|api-cloudim\.api\.weibo\.com|new\.vip\.weibo\.cn|card\.weibo\.com|biz\.weibo\.com)/,requires-body=1,max-size=4194304,argument=debug=1,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
 
 # ④ 开屏广告配置（JSON）：返回空对象，比 reject 更温和
-weibo-launch = type=http-response,pattern=^https?://(sdk|wb)app\.uve\.weibo\.com/interface/sdk/sdkad\.php,requires-body=1,max-size=1048576,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-launch.js
+weibo-launch = type=http-response,pattern=^https?://(sdk|wb)app\.uve\.weibo\.com/interface/sdk/sdkad\.php,requires-body=1,max-size=1048576,argument=debug=1,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-launch.js
 
 [MITM]
-hostname = %APPEND% api.weibo.cn, mapi.weibo.com, *.uve.weibo.com, m.weibo.cn, weibo.com, www.weibo.com, api-cloudim.api.weibo.com, new.vip.weibo.cn, card.weibo.com, biz.weibo.com
+hostname = %APPEND% api.weibo.cn, api.weibo.com, mapi.weibo.com, mapi.weibo.cn, *.uve.weibo.com, m.weibo.cn, weibo.com, www.weibo.com, api-cloudim.api.weibo.com, new.vip.weibo.cn, card.weibo.com, biz.weibo.com
