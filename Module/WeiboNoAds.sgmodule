@@ -32,7 +32,7 @@ weibo-any = type=http-response,pattern=^https?://m?api\.weibo\.c(n|om)/2/,requir
 weibo-web = type=http-response,pattern=^https?://(m\.weibo\.cn|weibo\.com|www\.weibo\.com|api-cloudim\.api\.weibo\.com|new\.vip\.weibo\.cn|card\.weibo\.com|biz\.weibo\.com)/,requires-body=1,max-size=2621440,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-noads.js
 
 # ④ 开屏广告配置（JSON）：返回空对象，比 reject 更温和
-weibo-launch = type=http-response,pattern=^https?://(sdk|wb)app\.uve\.weibo\.com/interface/sdk/sdkad\.php,requires-body=1,max-size=1048576,argument=debug=0,script-path=scripts/weibo-launch.js
+weibo-launch = type=http-response,pattern=^https?://(sdk|wb)app\.uve\.weibo\.com/interface/sdk/sdkad\.php,requires-body=1,max-size=1048576,argument=debug=0,script-path=https://raw.githubusercontent.com/DevCoz/Ruleset/refs/heads/Pv/Js/weibo-launch.js
 
 [MITM]
 hostname = %APPEND% api.weibo.cn, api.weibo.com, mapi.weibo.com, mapi.weibo.cn, *.uve.weibo.com, m.weibo.cn, weibo.com, www.weibo.com, api-cloudim.api.weibo.com, new.vip.weibo.cn, card.weibo.com, biz.weibo.com
