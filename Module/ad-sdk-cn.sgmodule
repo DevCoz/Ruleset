@@ -1,5 +1,5 @@
-#!name=国内广告 SDK 域名拦截
-#!desc=国内广告 SDK 清单整理的网络层拦截：穿山甲/Pangle、优量汇 GDT、百度联盟、快手、Sigmob、BeiZi、UBiX、AdGain、京东、ToBid
+#!name=广告 SDK 域名拦截
+#!desc=穿山甲/Pangle、优量汇 GDT、百度联盟、快手、Sigmob、BeiZi、UBiX、AdGain、京东、ToBid
 #!category=BetaModule
 
 [Rule]
