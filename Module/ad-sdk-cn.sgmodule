@@ -1,0 +1,59 @@
+#!name=国内广告 SDK 域名拦截
+#!desc=国内广告 SDK 清单整理的网络层拦截：穿山甲/Pangle、优量汇 GDT、百度联盟、快手、Sigmob、BeiZi、UBiX、AdGain、京东、ToBid
+#!category=BetaModule
+
+[Rule]
+# ── 穿山甲 / Pangle / CSJ（字节跳动）
+DOMAIN-SUFFIX,pangolin-sdk-toutiao.com,REJECT
+DOMAIN-SUFFIX,pangolin-sdk-toutiao-b.com,REJECT
+DOMAIN-SUFFIX,pangolin-dsp-toutiao.com,REJECT
+DOMAIN-SUFFIX,pangolin-dsp-toutiao-b.com,REJECT
+DOMAIN-SUFFIX,pglstatp-sdk-toutiao.com,REJECT
+DOMAIN-SUFFIX,pglstatp-snssdk-toutiao.com,REJECT
+DOMAIN-SUFFIX,csjplatform.com,REJECT
+DOMAIN-SUFFIX,sf16-static.i18n-pglstatp.com,REJECT
+
+# ── 优量汇 / 腾讯广告（GDT、TGGDT）
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+DOMAIN-SUFFIX,e.qq.com,REJECT
+DOMAIN-SUFFIX,pgdt.gtimg.cn,REJECT
+DOMAIN-SUFFIX,qzs.gdtimg.com,REJECT
+DOMAIN-SUFFIX,adsmind.gdtimg.com,REJECT
+DOMAIN-SUFFIX,adsfile.qq.com,REJECT
+DOMAIN-SUFFIX,adslvfile.qq.com,REJECT
+
+# ── 百度联盟 / MobAds
+DOMAIN-SUFFIX,mobads.baidu.com,REJECT
+DOMAIN-SUFFIX,mobads-logs.baidu.com,REJECT
+DOMAIN-SUFFIX,mobads.baidu.cn,REJECT
+DOMAIN-SUFFIX,sdk.mobads.adwangmai.com,REJECT
+DOMAIN-SUFFIX,ubmcmm.baidustatic.com,REJECT
+
+# ── 快手联盟
+DOMAIN-SUFFIX,e.kuaishou.com,REJECT
+DOMAIN-SUFFIX,e.kuaishou.cn,REJECT
+DOMAIN-SUFFIX,promotion-partner.kuaishou.com,REJECT
+DOMAIN-SUFFIX,wlog.kuaishou.com,REJECT
+DOMAIN-SUFFIX,open.kuaishouzt.com,REJECT
+
+# ── Sigmob
+DOMAIN-SUFFIX,sigmob.com,REJECT
+DOMAIN-SUFFIX,sigmob.cn,REJECT
+
+# ── BeiZi（倍孜）
+DOMAIN-SUFFIX,beizi.biz,REJECT
+
+# ── UBiX
+DOMAIN-SUFFIX,ubixioe.com,REJECT
+
+# ── AdGain
+DOMAIN-SUFFIX,adgain.cn,REJECT
+
+# ── 京东联盟
+DOMAIN-SUFFIX,jads.jd.com,REJECT
+DOMAIN-SUFFIX,addata.jd.com,REJECT
+DOMAIN-SUFFIX,ads-union.jd.com,REJECT
+DOMAIN-SUFFIX,ccc-x.jd.com,REJECT
+
+# ── ToBid（WindMill 聚合）
+DOMAIN-SUFFIX,tobiDad.com,REJECT
