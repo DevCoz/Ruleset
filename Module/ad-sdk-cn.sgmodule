@@ -49,6 +49,11 @@ DOMAIN-SUFFIX,ubixioe.com,REJECT
 # ── AdGain
 DOMAIN-SUFFIX,adgain.cn,REJECT
 
+# ── 美数 / AdMate
+DOMAIN-SUFFIX,admate.cn,REJECT
+DOMAIN-SUFFIX,admatex.cn,REJECT
+DOMAIN-SUFFIX,admatex.com,REJECT
+
 # ── 京东联盟
 DOMAIN-SUFFIX,jads.jd.com,REJECT
 DOMAIN-SUFFIX,addata.jd.com,REJECT
